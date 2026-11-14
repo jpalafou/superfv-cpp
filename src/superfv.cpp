@@ -1,11 +1,23 @@
 #include <iostream>
+#include <vector>
+
 #include "array.hpp"
+#include "sweep.hpp"
 
 int main() {
-    Array array(1, 5);
+    const std::vector<double> values = {1.0, 1.0, 2.0, 1.0, 1.0, 1.0};
+    const std::vector<float> stencil = {1.0f / 3.0f, 1.0f / 3.0f, 1.0f / 3.0f};
+    Array u_in(1, values.size());
+    Array u_out(1, values.size());
 
-    array(0, 0) = 1.0;
+    for (std::size_t i = 0; i < values.size(); ++i) {
+        u_in(0, i) = values[i];
+    }
 
-    for (std::size_t i = 0; i < 5; ++i) {std::cout << array(0, i) << ", ";}
-    std::cout << std::endl;
+    stencil_sweep(u_in, u_out, stencil);
+
+    std::cout << "Input\tSweep\n";
+    for (std::size_t i = 0; i < values.size(); ++i) {
+        std::cout << u_in(0, i) << '\t' << u_out(0, i) << '\n';
+    }
 }
