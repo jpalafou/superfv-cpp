@@ -9,7 +9,9 @@ project(SuperFV LANGUAGES CXX)
 add_executable(superfv
     src/superfv.cpp
     src/array.cpp
-    src/sweep.cpp
+    src/hydro.cpp
+    src/riemann_solver.cpp
     src/stencils.cpp
+    src/sweep.cpp
     src/update.cpp
 )
