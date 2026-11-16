@@ -2,22 +2,23 @@
 #include <vector>
 
 #include "array.hpp"
-#include "sweep.hpp"
+#include "update.hpp"
 
 int main() {
-    const std::vector<double> values = {1.0, 1.0, 2.0, 1.0, 1.0, 1.0};
-    const Stencil stencil{{1.0f / 3.0f, 1.0f / 3.0f, 1.0f / 3.0f}, 1};
-    Array u_in(1, values.size());
-    Array u_out(1, values.size());
+    const std::vector<double> values = {1.0, 0.8, 1.0, 0.2, 1.0, 0.5};
+    Array u(1, values.size());
+    Array f(1, values.size() - 1);
 
     for (std::size_t i = 0; i < values.size(); ++i) {
-        u_in(0, i) = values[i];
+        u(0, i) = values[i];
     }
 
-    stencil_sweep(u_in, u_out, stencil);
+    compute_1d_fluxes(u, f, 1);
 
-    std::cout << "Input\tSweep\n";
-    for (std::size_t i = 0; i < values.size(); ++i) {
-        std::cout << u_in(0, i) << '\t' << u_out(0, i) << '\n';
+    std::cout << "Fluxes\n";
+    for (std::size_t i = 0; i < f.get_nx(); ++i) {
+        if (i > 0) {std::cout << ", ";}
+        std::cout << f(0, i);
     }
+    std::cout << '\n';
 }

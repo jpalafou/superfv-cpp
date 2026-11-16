@@ -1,4 +1,4 @@
-#include <vector>
+#include <stdexcept>
 #include "array.hpp"
 #include "stencils.hpp"
 
@@ -12,7 +12,7 @@ void stencil_sweep_1d(const Array& u_in, Array& u_out, const Stencil& stencil, s
                 size_t i_t = i + w - reach;
                 result += stencil[w] * u_in(v, i_t);
             }
-            u_out(v, i) = result;
+            u_out(v, i - istart) = result;
         }
     }
 }
@@ -39,7 +39,7 @@ void stencil_sweep_2d(
                     else {              j_t += w - reach;}
                     result += stencil[w] * u_in(v, i_t, j_t);
                 }
-                u_out(v, i, j) = result;
+                u_out(v, i - istart, j - jstart) = result;
             }
         }
     }
@@ -71,7 +71,7 @@ void stencil_sweep_3d(
                         else {                  k_t += w - reach;}
                         result += stencil[w] * u_in(v, i_t, j_t, k_t);
                     }
-                    u_out(v, i, j, k) = result;
+                    u_out(v, i - istart, j - jstart, k - kstart) = result;
                 }
             }
         }

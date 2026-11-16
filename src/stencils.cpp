@@ -1,4 +1,5 @@
 #include <cstddef>
+#include <stdexcept>
 #include <vector>
 #include "stencils.hpp"
 

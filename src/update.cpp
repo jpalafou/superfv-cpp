@@ -1,4 +1,4 @@
-#include <vector>
+#include <stdexcept>
 #include "array.hpp"
 #include "stencils.hpp"
 #include "sweep.hpp"
@@ -22,5 +22,9 @@ void compute_1d_fluxes(const Array& u, Array& f, int p) {
         }
     }
 
-    
+    for (size_t v = 0; v < f.get_nvars(); v++) {
+        for (size_t i = 0; i < f.get_nx(); i++) {
+            f(v, i) = wl(v, i + reach);
+        }
+    }
 }
