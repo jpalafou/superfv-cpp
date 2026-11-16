@@ -1,9 +1,5 @@
 .vscode/
-
-build/CMakeFiles/
-build/*.cmake
-build/CMakeCache.txt
-build/Makefile
-build/superfv
+build/
 
 *.log
+*.out

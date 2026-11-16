@@ -6,4 +6,10 @@
 cmake_minimum_required(VERSION 4.3)
 project(SuperFV LANGUAGES CXX)
 
-add_executable(superfv src/superfv.cpp src/array.cpp src/sweep.cpp)
+add_executable(superfv
+    src/superfv.cpp
+    src/array.cpp
+    src/sweep.cpp
+    src/stencils.cpp
+    src/update.cpp
+)

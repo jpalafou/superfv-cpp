@@ -6,7 +6,7 @@
 
 int main() {
     const std::vector<double> values = {1.0, 1.0, 2.0, 1.0, 1.0, 1.0};
-    const std::vector<float> stencil = {1.0f / 3.0f, 1.0f / 3.0f, 1.0f / 3.0f};
+    const Stencil stencil{{1.0f / 3.0f, 1.0f / 3.0f, 1.0f / 3.0f}, 1};
     Array u_in(1, values.size());
     Array u_out(1, values.size());
 
