@@ -10,8 +10,12 @@ add_executable(superfv
     src/superfv.cpp
     src/array.cpp
     src/hydro.cpp
+    src/initial_condition_defs.cpp
+    src/initial_conditions.cpp
+    src/mesh.cpp
     src/riemann_solver.cpp
     src/stencils.cpp
     src/sweep.cpp
     src/update.cpp
 )
+target_compile_features(superfv PUBLIC cxx_std_20)
