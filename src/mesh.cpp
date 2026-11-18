@@ -23,8 +23,8 @@ UniformMesh::UniformMesh(double xlim0, double xlim1, size_t nx, double ylim0, do
     y_faces_ = linspace(ylim0, ylim1, ny + 1);
     z_faces_ = linspace(zlim0, zlim1, nz + 1);
     for (size_t i = 0; i < nx; i++) {x_centers_.push_back((x_faces_[i] + x_faces_[i+1]) / 2.0);}
-    for (size_t j = 0; j < ny; j++) {y_centers_.push_back((x_faces_[j] + y_faces_[j+1]) / 2.0);}
-    for (size_t k = 0; k < nz; k++) {z_centers_.push_back((x_faces_[k] + z_faces_[k+1]) / 2.0);}
+    for (size_t j = 0; j < ny; j++) {y_centers_.push_back((y_faces_[j] + y_faces_[j+1]) / 2.0);}
+    for (size_t k = 0; k < nz; k++) {z_centers_.push_back((z_faces_[k] + z_faces_[k+1]) / 2.0);}
 }
 const std::vector<double> UniformMesh::x_centers() const {return x_centers_;}
 const std::vector<double> UniformMesh::y_centers() const {return y_centers_;}

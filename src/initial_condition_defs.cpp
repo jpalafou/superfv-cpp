@@ -9,10 +9,24 @@ void validate_params(const std::vector<double>& params, size_t n) {
 
 double sinus(double x, double y, double z, Variable v, size_t ndim, const std::vector<double>& params) {
     validate_params(params, 6);
+    double rho_max, rho_min, uniform_vx, uniform_vy, uniform_vz, uniform_P;
+    if (params.empty()) {
+        rho_max    = 2.0;
+        rho_min    = 1.0;
+        uniform_vx = 1.0;
+        uniform_vy = 0.0;
+        uniform_vz = 0.0;
+        uniform_P  = 1.0;
+    } else {
+        rho_max    = params[0];
+        rho_min    = params[1];
+        uniform_vx = params[2];
+        uniform_vy = params[3];
+        uniform_vz = params[4];
+        uniform_P  = params[5];
+    }
     switch (v) {
         case Variable::rho: {
-            double rho_max = params[0];
-            double rho_min = params[1];
             double r;
             if      (ndim == 1) {r = x;}
             else if (ndim == 2) {r = x + y;}
@@ -20,13 +34,13 @@ double sinus(double x, double y, double z, Variable v, size_t ndim, const std::v
             return rho_min + (rho_max - rho_min) * (0.5 * std::sin(2.0 * std::numbers::pi * r) + 0.5);
         }
         case Variable::vx:
-            return params[2];
+            return uniform_vx;
         case Variable::vy:
-            return params[3];
+            return uniform_vy;
         case Variable::vz:
-            return params[4];
+            return uniform_vz;
         case Variable::P:
-            return params[5];
+            return uniform_P;
         default:
             throw std::invalid_argument("invalid Variable for sinus ic.");
     }
@@ -34,10 +48,24 @@ double sinus(double x, double y, double z, Variable v, size_t ndim, const std::v
 
 double square(double x, double y, double z, Variable v, size_t ndim, const std::vector<double>& params) {
     validate_params(params, 6);
+    double rho_max, rho_min, uniform_vx, uniform_vy, uniform_vz, uniform_P;
+    if (params.empty()) {
+        rho_max    = 2.0;
+        rho_min    = 1.0;
+        uniform_vx = 1.0;
+        uniform_vy = 0.0;
+        uniform_vz = 0.0;
+        uniform_P  = 1.0;
+    } else {
+        rho_max    = params[0];
+        rho_min    = params[1];
+        uniform_vx = params[2];
+        uniform_vy = params[3];
+        uniform_vz = params[4];
+        uniform_P  = params[5];
+    }
     switch (v) {
         case Variable::rho: {
-            double rho_max = params[0];
-            double rho_min = params[1];
             bool inside_x =                           x > 0.25 && x < 0.75;
             bool inside_y = (ndim >= 2) ? inside_x && y > 0.25 && y < 0.75 : true;
             bool inside_z = (ndim == 3) ? inside_y && z > 0.25 && z < 0.75 : true;
@@ -48,13 +76,13 @@ double square(double x, double y, double z, Variable v, size_t ndim, const std::
             }
         }
         case Variable::vx:
-            return params[2];
+            return uniform_vx;
         case Variable::vy:
-            return params[3];
+            return uniform_vy;
         case Variable::vz:
-            return params[4];
+            return uniform_vz;
         case Variable::P:
-            return params[5];
+            return uniform_P;
         default:
             throw std::invalid_argument("invalid Variable for sinus ic.");
     }

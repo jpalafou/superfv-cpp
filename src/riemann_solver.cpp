@@ -12,11 +12,11 @@ Conservatives llf(Primitives& wl, Primitives& wr, double gamma) {
     double sr = csr + std::abs(wr.v1);
     double smax = std::max(sl, sr);
 
-    double frho = (fl.rho + fr.rho - (smax * (ur.rho - ul.rho)));
-    double  fm1 = (fl.m1  + fr.m1  - (smax * (ur.m1  - ul.m1)));
-    double  fm2 = (fl.m2  + fr.m2  - (smax * (ur.m2  - ul.m2)));
-    double  fm3 = (fl.m3  + fr.m3  - (smax * (ur.m3  - ul.m3)));
-    double   fE = (fl.E   + fr.E   - (smax * (ur.E   - ul.E)));
+    double frho = 0.5 * (fl.rho + fr.rho - (smax * (ur.rho - ul.rho)));
+    double  fm1 = 0.5 * (fl.m1  + fr.m1  - (smax * (ur.m1  - ul.m1)));
+    double  fm2 = 0.5 * (fl.m2  + fr.m2  - (smax * (ur.m2  - ul.m2)));
+    double  fm3 = 0.5 * (fl.m3  + fr.m3  - (smax * (ur.m3  - ul.m3)));
+    double   fE = 0.5 * (fl.E   + fr.E   - (smax * (ur.E   - ul.E)));
     Conservatives fluxes{frho, fm1, fm2, fm3, fE};
     return fluxes;
 }

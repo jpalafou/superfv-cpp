@@ -10,7 +10,7 @@ Primitives cons_to_prim(const Conservatives& u, double gamma) {
     double v1 = u.m1 / u.rho;
     double v2 = u.m2 / u.rho;
     double v3 = u.m3 / u.rho;
-    double KE = 0.5 * ((u.m1 * u.m1) + (u.m2 * u.m2) + (u.m3 * u.m3));
+    double KE = 0.5 * ((u.m1 * u.m1) + (u.m2 * u.m2) + (u.m3 * u.m3)) / u.rho;
     double P = (gamma - 1.0) * (u.E - KE);
     Primitives w{u.rho, v1, v2, v3, P};
     return w;

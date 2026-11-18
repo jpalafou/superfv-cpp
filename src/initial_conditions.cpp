@@ -1,5 +1,7 @@
 #include <stdexcept>
 #include "array.hpp"
+#include "constants.hpp"
+#include "hydro.hpp"
 #include "initial_conditions.hpp"
 #include "mesh.hpp"
 
@@ -17,9 +19,18 @@ Array ic(const UniformMesh& mesh, Setup setup, const std::vector<double>& params
 
     if (ndim == 1) {
         for (int i = 0; i < mesh.get_nx(); i++) {
-            for (int v = 0; v < 5; v++) {
-                out(v, i) = ic_func(mesh.x_centers()[i], 0.0, 0.0, static_cast<Variable>(v), ndim, params, setup);
-            }
+            double rho = ic_func(mesh.x_centers()[i], 0.0, 0.0, Variable::rho, ndim, params, setup);
+            double vx  = ic_func(mesh.x_centers()[i], 0.0, 0.0, Variable::vx,  ndim, params, setup);
+            double vy  = ic_func(mesh.x_centers()[i], 0.0, 0.0, Variable::vy,  ndim, params, setup);
+            double vz  = ic_func(mesh.x_centers()[i], 0.0, 0.0, Variable::vz,  ndim, params, setup);
+            double P   = ic_func(mesh.x_centers()[i], 0.0, 0.0, Variable::P,   ndim, params, setup);
+            Primitives    primitive{rho, vx, vy, vz, P};
+            Conservatives conserved = prim_to_cons(primitive, gamma);
+            out(0, i) = conserved.rho;
+            out(1, i) = conserved.m1;
+            out(2, i) = conserved.m2;
+            out(3, i) = conserved.m3;
+            out(4, i) = conserved.E;
         }
     } else {
         throw std::logic_error("2D or 3D ics not yet implemented.");
