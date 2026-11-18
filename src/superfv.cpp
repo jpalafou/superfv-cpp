@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include "array.hpp"
+#include "boundary_conditions.hpp"
 #include "initial_conditions.hpp"
 #include "initial_condition_defs.hpp"
 #include "mesh.hpp"
@@ -23,9 +24,11 @@ void print_1d_array(Array& arr) {
 int main() {
     UniformMesh mesh = UniformMesh(0.0, 1.0, 8);
     Array u = ic(mesh, Setup::SQUARE, {2.0, 1.0, 1.0, 0.0, 0.0, 1.0});
-    Array f(u.get_nvars(), u.get_nx() - 1);
+    Array f(u.get_nvars(), u.get_nx() + 1);
+    Array upad = get_padded_u(u, 2);
 
-    compute_1d_fluxes(u, f, 1);
+    apply_bc(u, upad, 2, BC::periodic, BC::none);
+    compute_1d_fluxes(upad, f, 1);
 
     std::cout << "u\n";
     print_1d_array(u);

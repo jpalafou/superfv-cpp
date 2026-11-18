@@ -27,3 +27,7 @@ class Array {
 };
 
 bool has_same_shape(const Array& arr1, const Array& arr2);
+
+bool has_same_ndim(const Array& arr1, const Array& arr2);
+
+Array get_empty_copy(const Array& arr);

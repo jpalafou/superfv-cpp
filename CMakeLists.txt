@@ -9,6 +9,7 @@ project(SuperFV LANGUAGES CXX)
 add_executable(superfv
     src/superfv.cpp
     src/array.cpp
+    src/boundary_conditions.cpp
     src/hydro.cpp
     src/initial_condition_defs.cpp
     src/initial_conditions.cpp

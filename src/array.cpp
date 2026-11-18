@@ -44,3 +44,7 @@ bool has_same_shape(const Array& arr1, const Array& arr2) {
     if (arr1.get_nz() != arr2.get_nz()) {return false;}
     return true;
 }
+
+bool has_same_ndim(const Array& arr1, const Array& arr2) {return arr1.get_ndim() == arr2.get_ndim();}
+
+Array get_empty_copy(const Array& arr) {return Array(arr.get_nvars(), arr.get_nx(), arr.get_ny(), arr.get_nz());}

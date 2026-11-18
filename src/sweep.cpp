@@ -87,7 +87,7 @@ void stencil_sweep(
     size_t jstart,
     size_t kstart
 ) {
-    if (u_in.get_ndim() != u_out.get_ndim()) {throw std::invalid_argument("u_in and u_out must have same ndim.");}
+    if (!has_same_ndim(u_in, u_out)) {throw std::invalid_argument("u_in and u_out must have same ndim.");}
     if (u_in.get_nvars() != u_out.get_nvars()) {throw std::invalid_argument("u_in and u_out must have same nvars.");}
     if (u_in.get_ndim() == 2) {
         stencil_sweep_1d(u_in, u_out, stencil, istart);
