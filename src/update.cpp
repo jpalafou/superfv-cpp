@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include <algorithm>
 #include "array.hpp"
 #include "boundary_conditions.hpp"
 #include "constants.hpp"
@@ -47,5 +48,83 @@ void compute_1d_fluxes(const Array& upad, Array& f, int p) {
         f(2, i) = numflux.m2;
         f(3, i) = numflux.m3;
         f(4, i) = numflux.E;
+    }
+}
+
+void compute_fluxes(const Array& upad, Array& f, int p) {
+    if (upad.get_ndim()==2) {
+        compute_1d_fluxes(upad, f, p);
+    } else {
+        throw std::logic_error("2D and 3D fluxes not implemented yet");
+    }
+}
+
+double compute_1d_dt(const Array& u, double cfl, double gamma, double hx) {
+    double max_speed_over_length = 0.0;
+    for (size_t i = 0; i < u.get_nx(); i++) {
+        Primitives w = Primitives{u(0, i), u(1, i), u(2, i), u(3, i), u(4, i)};
+        double s = prim_to_cs(w, gamma);
+        s += std::abs(w.v1);
+        max_speed_over_length = std::max(s / hx, max_speed_over_length);
+    }
+    if (max_speed_over_length == 0.0) {throw std::runtime_error("cannot compute hydro dt with 0 velocity.");}
+    double dt = cfl / max_speed_over_length;
+    return dt;
+}
+
+double compute_2d_dt(const Array& u, double cfl, double gamma, double hx, double hy) {
+    double max_speed_over_length_sum = 0.0;
+    for (size_t i = 0; i < u.get_nx(); i++) {
+        for (size_t j = 0; i < u.get_ny(); j++) {
+            Primitives w = Primitives{u(0, i, j), u(1, i, j), u(2, i, j), u(3, i, j), u(4, i, j)};
+            double cs = prim_to_cs(w, gamma);
+            double speed_over_length_sum = (std::abs(w.v1) + cs) / hx;
+            speed_over_length_sum       += (std::abs(w.v2) + cs) / hy;
+            if (speed_over_length_sum > max_speed_over_length_sum) {
+                max_speed_over_length_sum = speed_over_length_sum;
+            }
+        }
+    }
+    if (max_speed_over_length_sum == 0.0) {throw std::runtime_error("cannot compute hydro dt with 0 velocity.");}
+    double dt = cfl / max_speed_over_length_sum;
+    return dt;
+}
+
+double compute_3d_dt(const Array& u, double cfl, double gamma, double hx, double hy, double hz) {
+    double max_speed_over_length_sum = 0.0;
+    for (size_t i = 0; i < u.get_nx(); i++) {
+        for (size_t j = 0; j < u.get_ny(); j++) {
+            for (size_t k = 0; k < u.get_nz(); k++) {
+                double rho = u(0, i, j, k);
+                double  mx = u(1, i, j, k);
+                double  my = u(2, i, j, k);
+                double  mz = u(3, i, j, k);
+                double   P = u(4, i, j, k);
+                Primitives w = Primitives{rho, mx, my, mz, P};
+                double cs = prim_to_cs(w, gamma);
+                double speed_over_length_sum = (std::abs(w.v1) + cs) / hx;
+                speed_over_length_sum       += (std::abs(w.v2) + cs) / hy;
+                speed_over_length_sum       += (std::abs(w.v3) + cs) / hz;
+                if (speed_over_length_sum > max_speed_over_length_sum) {
+                    max_speed_over_length_sum = speed_over_length_sum;
+                }
+            }
+        }
+    }
+    if (max_speed_over_length_sum == 0.0) {throw std::runtime_error("cannot compute hydro dt with 0 velocity.");}
+    double dt = cfl / max_speed_over_length_sum;
+    return dt;
+}
+
+double compute_dt(const Array& u, double cfl, double gamma, double hx, double hy, double hz) {
+    switch (u.get_ndim()) {
+        case 2:
+            return compute_1d_dt(u, cfl, gamma, hx);
+        case 3:
+            return compute_2d_dt(u, cfl, gamma, hx, hy);
+        case 4:
+            return compute_3d_dt(u, cfl, gamma, hx, hy, hz);
+        default:
+            throw std::invalid_argument("got invalid ndim.");
     }
 }
