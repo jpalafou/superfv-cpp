@@ -1,6 +1,8 @@
 #include <cstddef>
 #include "array.hpp"
 
+Array::Array()                                              : nvars(0),  nx(0),  ny(0),  nz(0),  data(0) {}
+Array::Array(size_t n1)                                     : nvars(n1), nx(1),  ny(1),  nz(1),  data(n1) {}
 Array::Array(size_t n1, size_t n2)                          : nvars(n1), nx(n2), ny(1),  nz(1),  data(n1 * n2) {}
 Array::Array(size_t n1, size_t n2, size_t n3)               : nvars(n1), nx(n2), ny(n3), nz(1),  data(n1 * n2 * n3) {}
 Array::Array(size_t n1, size_t n2, size_t n3, size_t n4)    : nvars(n1), nx(n2), ny(n3), nz(n4), data(n1 * n2 * n3 * n4) {}

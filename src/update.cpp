@@ -9,9 +9,7 @@
 #include "sweep.hpp"
 #include "update.hpp"
 
-constexpr size_t nghost = 2;
-
-void compute_1d_fluxes(const Array& upad, Array& f, int p) {
+void update_1d_fluxes(const Array& upad, Array& f, int p, size_t nghost) {
     Array ul = get_empty_copy(upad);
     Array ur = get_empty_copy(upad);
     Stencil  left = conservative_interpolation(p, Position::left);
@@ -51,11 +49,22 @@ void compute_1d_fluxes(const Array& upad, Array& f, int p) {
     }
 }
 
-void compute_fluxes(const Array& upad, Array& f, int p) {
-    if (upad.get_ndim()==2) {
-        compute_1d_fluxes(upad, f, p);
-    } else {
-        throw std::logic_error("2D and 3D fluxes not implemented yet");
+void update_fluxes(const Array& u, Array& f, Array& g, Array& h, int p, size_t nghost) {
+    Array upad = get_padded_u(u, nghost);
+    apply_bc(u, upad, nghost, BC::periodic, BC::none);
+
+    switch (u.get_ndim()) {
+        case 2:
+            update_1d_fluxes(upad, f, p, nghost);
+            return;
+        case 3:
+            throw std::invalid_argument("2D fluxes not yet implemented.");
+            return;
+        case 4:
+            throw std::invalid_argument("3D fluxes not yet implemented.");
+            return;
+        default:
+            throw std::invalid_argument("upad must have ndim 2, 3, or 4.");
     }
 }
 
@@ -126,5 +135,245 @@ double compute_dt(const Array& u, double cfl, double gamma, double hx, double hy
             return compute_3d_dt(u, cfl, gamma, hx, hy, hz);
         default:
             throw std::invalid_argument("got invalid ndim.");
+    }
+}
+
+void update_dudt_1d(Array& dudt, const Array& f, double hx) {
+    for (size_t v = 0; v < dudt.get_nvars(); v++) {
+        for (size_t i = 0; i < dudt.get_nx(); i++) {
+            dudt(v, i) = -(f(v, i+1) - f(v, i)) / hx;
+        }
+    }
+    return;
+}
+
+void update_dudt_2d(Array& dudt, const Array& f, const Array& g, double hx, double hy) {
+    for (size_t v = 0; v < dudt.get_nvars(); v++) {
+        for (size_t i = 0; i < dudt.get_nx(); i++) {
+            for (size_t j = 0; j < dudt.get_ny(); j++) {
+                dudt(v, i, j)  = -(f(v, i+1, j) - f(v, i, j)) / hx;
+                dudt(v, i, j) += -(g(v, i, j+1) - g(v, i, j)) / hy;
+            }
+        }
+    }
+    return;
+}
+
+void update_dudt_3d(Array& dudt, const Array& f, const Array& g, const Array& h, double hx, double hy, double hz) {
+    for (size_t v = 0; v < dudt.get_nvars(); v++) {
+        for (size_t i = 0; i < dudt.get_nx(); i++) {
+            for (size_t j = 0; j < dudt.get_ny(); j++) {
+                for (size_t k = 0; k < dudt.get_nz(); k++) {
+                    dudt(v, i, j, k)  = -(f(v, i+1, j, k) - f(v, i, j, k)) / hx;
+                    dudt(v, i, j, k) += -(g(v, i, j+1, k) - g(v, i, j, k)) / hy;
+                    dudt(v, i, j, k) += -(h(v, i, j, k+1) - h(v, i, j, k)) / hz;
+                }
+            }
+        }
+    }
+    return;
+}
+
+void update_dudt(Array& dudt, const Array& f, const Array& g, const Array& h, double hx, double hy, double hz) {
+    switch (dudt.get_ndim()) {
+        case 2:
+            update_dudt_1d(dudt, f, hx);
+            return;
+        case 3:
+            update_dudt_2d(dudt, f, g, hx, hy);
+            return;
+        case 4:
+            update_dudt_3d(dudt, f, g, h, hx, hy, hz);
+            return;
+        default:
+            throw std::invalid_argument("uold must have ndim 2, 3, or 4.");
+    }
+}
+
+void update_unew(const Array& uold, const Array& dudt, Array& unew, double dt) {
+    for (size_t v = 0; v < uold.get_nvars(); v++) {
+        for (size_t i = 0; i < uold.get_nx(); i++) {
+            for (size_t j = 0; j < uold.get_ny(); j++) {
+                for (size_t k = 0; k < uold.get_nz(); k++) {
+                    unew(v, i, j, k)  = uold(v, i, j, k) + (dt * dudt(v, i, j, k));
+                }
+            }
+        }
+    }
+    return;
+}
+
+void forward_euler_step(
+    const Array& uold,
+    Array& unew,
+    Array& f, 
+    Array& g, 
+    Array& h, 
+    double hx,
+    double hy,
+    double hz,
+    double dt,
+    int p,
+    size_t nghost
+) {
+    Array dudt = get_empty_copy(unew);
+    update_fluxes(uold, f, g, h, p, nghost);
+    update_dudt(dudt, f, g, h, hx, hy, hz);
+    update_unew(uold, dudt, unew, dt);
+    return;
+}
+
+void ssprk2_step(
+    const Array& uold,
+    Array& unew,
+    Array& f, 
+    Array& g, 
+    Array& h, 
+    double hx,
+    double hy,
+    double hz,
+    double dt,
+    int p,
+    size_t nghost
+) {
+    Array dudt = get_empty_copy(unew);
+    Array utmp = get_empty_copy(unew);
+
+    update_fluxes(uold, f, g, h, p, nghost);
+    update_dudt(dudt, f, g, h, hx, hy, hz);
+    update_unew(uold, dudt, utmp, dt);
+
+    update_fluxes(utmp, f, g, h, p, nghost);
+    update_dudt(dudt, f, g, h, hx, hy, hz);
+    
+    for (size_t v = 0; v < uold.get_nvars(); v++) {
+        for (size_t i = 0; i < uold.get_nx(); i++) {
+            for (size_t j = 0; j < uold.get_ny(); j++) {
+                for (size_t k = 0; k < uold.get_nz(); k++) {
+                    unew(v, i, j, k)  = 0.5 * uold(v, i, j, k);
+                    unew(v, i, j, k) += 0.5 * (utmp(v, i, j, k) + (dt * dudt(v, i, j, k)));
+                }
+            }
+        }
+    }
+    return;
+}
+
+void ssprk3_step(
+    const Array& uold,
+    Array& unew,
+    Array& f, 
+    Array& g, 
+    Array& h, 
+    double hx,
+    double hy,
+    double hz,
+    double dt,
+    int p,
+    size_t nghost
+) {
+    Array dut0 = get_empty_copy(unew);
+    Array dut1 = get_empty_copy(unew);
+    Array dut2 = get_empty_copy(unew);
+    Array utmp = get_empty_copy(unew);
+
+    update_fluxes(uold, f, g, h, p, nghost);
+    update_dudt(dut0, f, g, h, hx, hy, hz);
+    update_unew(uold, dut0, utmp, dt);
+
+    update_fluxes(utmp, f, g, h, p, nghost);
+    update_dudt(dut1, f, g, h, hx, hy, hz);
+    for (size_t v = 0; v < uold.get_nvars(); v++) {
+        for (size_t i = 0; i < uold.get_nx(); i++) {
+            for (size_t j = 0; j < uold.get_ny(); j++) {
+                for (size_t k = 0; k < uold.get_nz(); k++) {
+                    utmp(v, i, j, k)  = uold(v, i, j, k);
+                    utmp(v, i, j, k) += 0.25 * dt * dut0(v, i, j, k);
+                    utmp(v, i, j, k) += 0.25 * dt * dut1(v, i, j, k);
+                }
+            }
+        }
+    }
+
+    update_fluxes(utmp, f, g, h, p, nghost);
+    update_dudt(dut2, f, g, h, hx, hy, hz);
+
+    for (size_t v = 0; v < uold.get_nvars(); v++) {
+        for (size_t i = 0; i < uold.get_nx(); i++) {
+            for (size_t j = 0; j < uold.get_ny(); j++) {
+                for (size_t k = 0; k < uold.get_nz(); k++) {
+                    double dudt_sum_term = dut0(v, i, j, k) + dut1(v, i, j, k) + (2.0 * dut2(v, i, j, k));
+                    unew(v, i, j, k)  = uold(v, i, j, k) + (dt * dudt_sum_term / 6.0);
+                }
+            }
+        }
+    }
+    return;
+}
+
+void rk4_step(
+    const Array& uold,
+    Array& unew,
+    Array& f, 
+    Array& g, 
+    Array& h, 
+    double hx,
+    double hy,
+    double hz,
+    double dt,
+    int p,
+    size_t nghost
+) {
+    Array dut0 = get_empty_copy(unew);
+    Array dut1 = get_empty_copy(unew);
+    Array dut2 = get_empty_copy(unew);
+    Array dut3 = get_empty_copy(unew);
+    Array utmp = get_empty_copy(unew);
+
+    update_fluxes(uold, f, g, h, p, nghost);
+    update_dudt(dut0, f, g, h, hx, hy, hz);
+    update_unew(uold, dut0, utmp, 0.5 * dt);
+
+    update_fluxes(utmp, f, g, h, p, nghost);
+    update_dudt(dut1, f, g, h, hx, hy, hz);
+    update_unew(uold, dut1, utmp, 0.5 * dt);
+
+    update_fluxes(utmp, f, g, h, p, nghost);
+    update_dudt(dut2, f, g, h, hx, hy, hz);
+    update_unew(uold, dut2, utmp, dt);
+
+    update_fluxes(utmp, f, g, h, p, nghost);
+    update_dudt(dut3, f, g, h, hx, hy, hz);
+    
+    for (size_t v = 0; v < uold.get_nvars(); v++) {
+        for (size_t i = 0; i < uold.get_nx(); i++) {
+            for (size_t j = 0; j < uold.get_ny(); j++) {
+                for (size_t k = 0; k < uold.get_nz(); k++) {
+                    double dudt_sum_term = dut0(v, i, j, k) + (2.0 * dut1(v, i, j, k));
+                    dudt_sum_term += (2.0 * dut2(v, i, j, k)) + dut3(v, i, j, k);
+                    unew(v, i, j, k)  = uold(v, i, j, k) + (dt * dudt_sum_term / 6.0);
+                }
+            }
+        }
+    }
+    return;
+}
+
+void take_step(const Array& uold, Array& unew, Array& f, Array& g, Array& h, double hx, double hy, double hz, double dt, int p, size_t nghost, Integrator integrator) {
+    switch (integrator) {
+        case Integrator::forward_euler:
+            forward_euler_step(uold, unew, f, g, h, hx, hy, hz, dt, p, nghost);
+            return;
+        case Integrator::ssprk2:
+            ssprk2_step(uold, unew, f, g, h, hx, hy, hz, dt, p, nghost);
+            return;
+        case Integrator::ssprk3:
+            ssprk3_step(uold, unew, f, g, h, hx, hy, hz, dt, p, nghost);
+            return;
+        case Integrator::rk4:
+            rk4_step(uold, unew, f, g, h, hx, hy, hz, dt, p, nghost);
+            return;
+        default:
+            throw std::invalid_argument("invalid integrator.");
     }
 }

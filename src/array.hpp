@@ -4,6 +4,7 @@
 
 class Array {
     public:
+        Array();
         Array(size_t n1);
         Array(size_t n1, size_t n2);
         Array(size_t n1, size_t n2, size_t n3);
