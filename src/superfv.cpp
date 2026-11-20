@@ -22,14 +22,18 @@ void print_1d_array(Array& arr) {
 }
 
 int main() {
-    UniformMesh mesh = UniformMesh(0.0, 1.0, 8);
-    Array uold = ic(mesh, Setup::SQUARE);
+    double gamma = 1.4;
+    UniformMeshParams meshparams = UniformMeshParams{2, 0.0, 1.0, 8};
+    UniformMesh mesh = UniformMesh(meshparams);
+    Array uold = ic(mesh, Setup::SQUARE, gamma);
     Array f(uold.get_nvars(), uold.get_nx() + 1);
     Array unew = get_empty_copy(uold);
     Array dummy = Array();
+    int p = 0;
+    Integrator integrator = Integrator::forward_euler;
 
-    double dt = 0.8 / (2.0 / mesh.get_hx());
-    take_step(uold, unew, f, dummy, dummy, mesh.get_hx(), mesh.get_hy(), mesh.get_hz(), dt, 0, 2, Integrator::forward_euler);
+    double dt = compute_dt(uold, 0.8, gamma, meshparams);
+    take_step(uold, unew, f, dummy, dummy, dt, meshparams, p, integrator, gamma);
 
     std::cout << "uold\n";
     print_1d_array(uold);

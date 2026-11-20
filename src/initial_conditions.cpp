@@ -1,24 +1,24 @@
 #include <stdexcept>
 #include "array.hpp"
-#include "constants.hpp"
 #include "hydro.hpp"
 #include "initial_conditions.hpp"
 #include "mesh.hpp"
 
-Array get_array_from_mesh(const UniformMesh& mesh) {
+Array get_array_from_mesh(const UniformMeshParams& meshparams) {
     const size_t nvars = 5;
-    if      (mesh.get_ndim() == 1) {return Array(nvars, mesh.get_nx());}
-    else if (mesh.get_ndim() == 2) {return Array(nvars, mesh.get_nx(), mesh.get_ny());}
-    else if (mesh.get_ndim() == 3) {return Array(nvars, mesh.get_nx(), mesh.get_ny(), mesh.get_nz());}
+    if      (meshparams.ndim() == 1) {return Array(nvars, meshparams.nx);}
+    else if (meshparams.ndim() == 2) {return Array(nvars, meshparams.nx, meshparams.ny);}
+    else if (meshparams.ndim() == 3) {return Array(nvars, meshparams.nx, meshparams.ny, meshparams.nz);}
     throw std::invalid_argument("ndim must be 1, 2, or 3.");
 }
 
-Array ic(const UniformMesh& mesh, Setup setup, const std::vector<double>& params) {
-    Array out = get_array_from_mesh(mesh);
-    size_t ndim = mesh.get_ndim();
+Array ic(const UniformMesh& mesh, Setup setup, double gamma, const std::vector<double>& params) {
+    UniformMeshParams meshparams = mesh.get_params();
+    Array out = get_array_from_mesh(meshparams);
+    size_t ndim = meshparams.ndim();
 
     if (ndim == 1) {
-        for (int i = 0; i < mesh.get_nx(); i++) {
+        for (int i = 0; i < meshparams.nx; i++) {
             double rho = ic_func(mesh.x_centers()[i], 0.0, 0.0, Variable::rho, ndim, params, setup);
             double vx  = ic_func(mesh.x_centers()[i], 0.0, 0.0, Variable::vx,  ndim, params, setup);
             double vy  = ic_func(mesh.x_centers()[i], 0.0, 0.0, Variable::vy,  ndim, params, setup);

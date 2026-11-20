@@ -2,14 +2,14 @@
 #include <algorithm>
 #include "array.hpp"
 #include "boundary_conditions.hpp"
-#include "constants.hpp"
 #include "hydro.hpp"
+#include "mesh.hpp"
 #include "riemann_solver.hpp"
 #include "stencils.hpp"
 #include "sweep.hpp"
 #include "update.hpp"
 
-void update_1d_fluxes(const Array& upad, Array& f, int p, size_t nghost) {
+void update_1d_fluxes(const Array& upad, Array& f, int p, size_t nghost, double gamma) {
     Array ul = get_empty_copy(upad);
     Array ur = get_empty_copy(upad);
     Stencil  left = conservative_interpolation(p, Position::left);
@@ -49,13 +49,13 @@ void update_1d_fluxes(const Array& upad, Array& f, int p, size_t nghost) {
     }
 }
 
-void update_fluxes(const Array& u, Array& f, Array& g, Array& h, int p, size_t nghost) {
+void update_fluxes(const Array& u, Array& f, Array& g, Array& h, int p, size_t nghost, double gamma) {
     Array upad = get_padded_u(u, nghost);
     apply_bc(u, upad, nghost, BC::periodic, BC::none);
 
     switch (u.get_ndim()) {
         case 2:
-            update_1d_fluxes(upad, f, p, nghost);
+            update_1d_fluxes(upad, f, p, nghost, gamma);
             return;
         case 3:
             throw std::invalid_argument("2D fluxes not yet implemented.");
@@ -125,14 +125,14 @@ double compute_3d_dt(const Array& u, double cfl, double gamma, double hx, double
     return dt;
 }
 
-double compute_dt(const Array& u, double cfl, double gamma, double hx, double hy, double hz) {
+double compute_dt(const Array& u, double cfl, double gamma, const UniformMeshParams& meshparams) {
     switch (u.get_ndim()) {
         case 2:
-            return compute_1d_dt(u, cfl, gamma, hx);
+            return compute_1d_dt(u, cfl, gamma, meshparams.hx());
         case 3:
-            return compute_2d_dt(u, cfl, gamma, hx, hy);
+            return compute_2d_dt(u, cfl, gamma, meshparams.hx(), meshparams.hy());
         case 4:
-            return compute_3d_dt(u, cfl, gamma, hx, hy, hz);
+            return compute_3d_dt(u, cfl, gamma, meshparams.hx(), meshparams.hy(), meshparams.hz());
         default:
             throw std::invalid_argument("got invalid ndim.");
     }
@@ -174,16 +174,16 @@ void update_dudt_3d(Array& dudt, const Array& f, const Array& g, const Array& h,
     return;
 }
 
-void update_dudt(Array& dudt, const Array& f, const Array& g, const Array& h, double hx, double hy, double hz) {
+void update_dudt(Array& dudt, const Array& f, const Array& g, const Array& h, const UniformMeshParams& meshparams) {
     switch (dudt.get_ndim()) {
         case 2:
-            update_dudt_1d(dudt, f, hx);
+            update_dudt_1d(dudt, f, meshparams.hx());
             return;
         case 3:
-            update_dudt_2d(dudt, f, g, hx, hy);
+            update_dudt_2d(dudt, f, g, meshparams.hx(), meshparams.hy());
             return;
         case 4:
-            update_dudt_3d(dudt, f, g, h, hx, hy, hz);
+            update_dudt_3d(dudt, f, g, h, meshparams.hx(), meshparams.hy(), meshparams.hz());
             return;
         default:
             throw std::invalid_argument("uold must have ndim 2, 3, or 4.");
@@ -209,16 +209,14 @@ void forward_euler_step(
     Array& f, 
     Array& g, 
     Array& h, 
-    double hx,
-    double hy,
-    double hz,
     double dt,
+    const UniformMeshParams& meshparams,
     int p,
-    size_t nghost
+    double gamma
 ) {
     Array dudt = get_empty_copy(unew);
-    update_fluxes(uold, f, g, h, p, nghost);
-    update_dudt(dudt, f, g, h, hx, hy, hz);
+    update_fluxes(uold, f, g, h, p, meshparams.nghost, gamma);
+    update_dudt(dudt, f, g, h, meshparams);
     update_unew(uold, dudt, unew, dt);
     return;
 }
@@ -229,22 +227,20 @@ void ssprk2_step(
     Array& f, 
     Array& g, 
     Array& h, 
-    double hx,
-    double hy,
-    double hz,
     double dt,
+    const UniformMeshParams& meshparams,
     int p,
-    size_t nghost
+    double gamma
 ) {
     Array dudt = get_empty_copy(unew);
     Array utmp = get_empty_copy(unew);
 
-    update_fluxes(uold, f, g, h, p, nghost);
-    update_dudt(dudt, f, g, h, hx, hy, hz);
+    update_fluxes(uold, f, g, h, p, meshparams.nghost, gamma);
+    update_dudt(dudt, f, g, h, meshparams);
     update_unew(uold, dudt, utmp, dt);
 
-    update_fluxes(utmp, f, g, h, p, nghost);
-    update_dudt(dudt, f, g, h, hx, hy, hz);
+    update_fluxes(utmp, f, g, h, p, meshparams.nghost, gamma);
+    update_dudt(dudt, f, g, h, meshparams);
     
     for (size_t v = 0; v < uold.get_nvars(); v++) {
         for (size_t i = 0; i < uold.get_nx(); i++) {
@@ -265,24 +261,22 @@ void ssprk3_step(
     Array& f, 
     Array& g, 
     Array& h, 
-    double hx,
-    double hy,
-    double hz,
     double dt,
+    const UniformMeshParams& meshparams,
     int p,
-    size_t nghost
+    double gamma
 ) {
     Array dut0 = get_empty_copy(unew);
     Array dut1 = get_empty_copy(unew);
     Array dut2 = get_empty_copy(unew);
     Array utmp = get_empty_copy(unew);
 
-    update_fluxes(uold, f, g, h, p, nghost);
-    update_dudt(dut0, f, g, h, hx, hy, hz);
+    update_fluxes(uold, f, g, h, p, meshparams.nghost, gamma);
+    update_dudt(dut0, f, g, h, meshparams);
     update_unew(uold, dut0, utmp, dt);
 
-    update_fluxes(utmp, f, g, h, p, nghost);
-    update_dudt(dut1, f, g, h, hx, hy, hz);
+    update_fluxes(utmp, f, g, h, p, meshparams.nghost, gamma);
+    update_dudt(dut1, f, g, h, meshparams);
     for (size_t v = 0; v < uold.get_nvars(); v++) {
         for (size_t i = 0; i < uold.get_nx(); i++) {
             for (size_t j = 0; j < uold.get_ny(); j++) {
@@ -295,8 +289,8 @@ void ssprk3_step(
         }
     }
 
-    update_fluxes(utmp, f, g, h, p, nghost);
-    update_dudt(dut2, f, g, h, hx, hy, hz);
+    update_fluxes(utmp, f, g, h, p, meshparams.nghost, gamma);
+    update_dudt(dut2, f, g, h, meshparams);
 
     for (size_t v = 0; v < uold.get_nvars(); v++) {
         for (size_t i = 0; i < uold.get_nx(); i++) {
@@ -317,12 +311,10 @@ void rk4_step(
     Array& f, 
     Array& g, 
     Array& h, 
-    double hx,
-    double hy,
-    double hz,
     double dt,
+    const UniformMeshParams& meshparams,
     int p,
-    size_t nghost
+    double gamma
 ) {
     Array dut0 = get_empty_copy(unew);
     Array dut1 = get_empty_copy(unew);
@@ -330,20 +322,20 @@ void rk4_step(
     Array dut3 = get_empty_copy(unew);
     Array utmp = get_empty_copy(unew);
 
-    update_fluxes(uold, f, g, h, p, nghost);
-    update_dudt(dut0, f, g, h, hx, hy, hz);
+    update_fluxes(uold, f, g, h, p, meshparams.nghost, gamma);
+    update_dudt(dut0, f, g, h, meshparams);
     update_unew(uold, dut0, utmp, 0.5 * dt);
 
-    update_fluxes(utmp, f, g, h, p, nghost);
-    update_dudt(dut1, f, g, h, hx, hy, hz);
+    update_fluxes(utmp, f, g, h, p, meshparams.nghost, gamma);
+    update_dudt(dut1, f, g, h, meshparams);
     update_unew(uold, dut1, utmp, 0.5 * dt);
 
-    update_fluxes(utmp, f, g, h, p, nghost);
-    update_dudt(dut2, f, g, h, hx, hy, hz);
+    update_fluxes(utmp, f, g, h, p, meshparams.nghost, gamma);
+    update_dudt(dut2, f, g, h, meshparams);
     update_unew(uold, dut2, utmp, dt);
 
-    update_fluxes(utmp, f, g, h, p, nghost);
-    update_dudt(dut3, f, g, h, hx, hy, hz);
+    update_fluxes(utmp, f, g, h, p, meshparams.nghost, gamma);
+    update_dudt(dut3, f, g, h, meshparams);
     
     for (size_t v = 0; v < uold.get_nvars(); v++) {
         for (size_t i = 0; i < uold.get_nx(); i++) {
@@ -359,19 +351,30 @@ void rk4_step(
     return;
 }
 
-void take_step(const Array& uold, Array& unew, Array& f, Array& g, Array& h, double hx, double hy, double hz, double dt, int p, size_t nghost, Integrator integrator) {
+void take_step(
+    const Array& uold,
+    Array& unew,
+    Array& f,
+    Array& g,
+    Array& h,
+    double dt,
+    const UniformMeshParams& meshparams,
+    int p,
+    Integrator integrator,
+    double gamma
+) {
     switch (integrator) {
         case Integrator::forward_euler:
-            forward_euler_step(uold, unew, f, g, h, hx, hy, hz, dt, p, nghost);
+            forward_euler_step(uold, unew, f, g, h, dt, meshparams, p, gamma);
             return;
         case Integrator::ssprk2:
-            ssprk2_step(uold, unew, f, g, h, hx, hy, hz, dt, p, nghost);
+            ssprk2_step(uold, unew, f, g, h, dt, meshparams, p, gamma);
             return;
         case Integrator::ssprk3:
-            ssprk3_step(uold, unew, f, g, h, hx, hy, hz, dt, p, nghost);
+            ssprk3_step(uold, unew, f, g, h, dt, meshparams, p, gamma);
             return;
         case Integrator::rk4:
-            rk4_step(uold, unew, f, g, h, hx, hy, hz, dt, p, nghost);
+            rk4_step(uold, unew, f, g, h, dt, meshparams, p, gamma);
             return;
         default:
             throw std::invalid_argument("invalid integrator.");
