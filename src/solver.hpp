@@ -15,4 +15,4 @@ struct SolverParams{
     Integrator integrator;
 };
 
-Array hydro_solver(Setup ic, const SolverParams& params, Real t);
+Array superfv(Setup ic, const SolverParams& params, Real t);

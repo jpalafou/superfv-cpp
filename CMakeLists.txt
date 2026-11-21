@@ -7,7 +7,7 @@ cmake_minimum_required(VERSION 4.3)
 project(SuperFV LANGUAGES CXX)
 
 add_executable(superfv
-    src/superfv.cpp
+    src/runner.cpp
     src/array.cpp
     src/boundary_conditions.cpp
     src/hydro.cpp

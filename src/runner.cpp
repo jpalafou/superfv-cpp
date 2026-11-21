@@ -32,7 +32,7 @@ int main() {
         1,
         Integrator::ssprk2
     };
-    Array u = hydro_solver(Setup::SQUARE, params, 0.000001);
+    Array u = superfv(Setup::SQUARE, params, 0.000001);
 
     std::cout << "u\n";
     print_1d_array(u);
