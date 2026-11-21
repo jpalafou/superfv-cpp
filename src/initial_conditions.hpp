@@ -1,6 +1,7 @@
 #pragma once
 #include "array.hpp"
+#include "common.hpp"
 #include "initial_condition_defs.hpp"
 #include "mesh.hpp"
 
-Array ic(const UniformMesh& mesh, Setup setup, double gamma, const std::vector<double>& params = {});
+Array ic(const UniformMesh& mesh, Setup setup, Real gamma, const std::vector<Real>& params = {});

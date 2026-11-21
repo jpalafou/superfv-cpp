@@ -1,20 +1,21 @@
 #pragma once
 #include <vector>
+#include "common.hpp"
 
 struct UniformMeshParams {
-    const double     xlim0;
-    const double     xlim1;
-    const size_t        nx; 
-    const double     ylim0 = 0.0; 
-    const double     ylim1 = 1.0; 
-    const size_t        ny = 1;
-    const double     zlim0 = 0.0; 
-    const double     zlim1 = 1.0;
-    const size_t        nz = 1;
+    const Real   xlim0;
+    const Real   xlim1;
+    const size_t    nx; 
+    const Real   ylim0 = 0.0; 
+    const Real   ylim1 = 1.0; 
+    const size_t    ny = 1;
+    const Real   zlim0 = 0.0; 
+    const Real   zlim1 = 1.0;
+    const size_t    nz = 1;
 
-    double hx() const;
-    double hy() const;
-    double hz() const;
+    Real hx() const;
+    Real hy() const;
+    Real hz() const;
     size_t ndim() const;
 };
 
@@ -22,13 +23,13 @@ class UniformMesh {
     public:
         UniformMesh(const UniformMeshParams& params);
         const UniformMeshParams& get_params() const;
-        const std::vector<double> x_centers() const;
-        const std::vector<double> y_centers() const;
-        const std::vector<double> z_centers() const;
-        const std::vector<double> x_faces() const;
-        const std::vector<double> y_faces() const;
-        const std::vector<double> z_faces() const;
+        const std::vector<Real> x_centers() const;
+        const std::vector<Real> y_centers() const;
+        const std::vector<Real> z_centers() const;
+        const std::vector<Real> x_faces() const;
+        const std::vector<Real> y_faces() const;
+        const std::vector<Real> z_faces() const;
     private:
         UniformMeshParams params_;
-        std::vector<double> x_centers_, y_centers_, z_centers_, x_faces_, y_faces_, z_faces_;
+        std::vector<Real> x_centers_, y_centers_, z_centers_, x_faces_, y_faces_, z_faces_;
 };

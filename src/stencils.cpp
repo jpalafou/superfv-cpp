@@ -1,15 +1,16 @@
 #include <cstddef>
 #include <stdexcept>
 #include <vector>
+#include "common.hpp"
 #include "stencils.hpp"
 
-const double& Stencil::operator[](std::size_t i) const {return data[i];}
+const Real& Stencil::operator[](std::size_t i) const {return data[i];}
 const std::size_t Stencil::size() const {return data.size();}
 const std::size_t Stencil::left_reach() const {return data.size() / 2;}
 const std::size_t Stencil::right_reach() const {return (data.size() - 1) / 2;}
 
 const Stencil conservative_interpolation(int p, Position pos) {   
-    std::vector<double> data; 
+    std::vector<Real> data; 
     switch (p) {
         case 0:
             data.push_back(1.0);

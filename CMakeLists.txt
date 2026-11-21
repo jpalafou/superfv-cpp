@@ -19,4 +19,8 @@ add_executable(superfv
     src/sweep.cpp
     src/update.cpp
 )
+set(SUPERFV_REAL_TYPE "double" CACHE STRING "Floating-point type")
+target_compile_definitions(superfv PRIVATE
+    SUPERFV_REAL_TYPE=${SUPERFV_REAL_TYPE}
+)
 target_compile_features(superfv PUBLIC cxx_std_20)

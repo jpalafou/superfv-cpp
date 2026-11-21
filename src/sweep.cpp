@@ -1,5 +1,6 @@
 #include <stdexcept>
 #include "array.hpp"
+#include "common.hpp"
 #include "stencils.hpp"
 
 void stencil_sweep_1d(const Array& u_in, Array& u_out, const Stencil& stencil, size_t istart = 0) {
@@ -7,7 +8,7 @@ void stencil_sweep_1d(const Array& u_in, Array& u_out, const Stencil& stencil, s
     const size_t reach = stencil.left_reach();
     for (size_t v = 0; v < u_in.get_nvars(); v++) {
         for (size_t i = istart; i < istop; i++) {
-            double result = 0.0;
+            Real result = 0.0;
             for (size_t w = 0; w < stencil.size(); w++) {
                 size_t i_t = i + w - reach;
                 result += stencil[w] * u_in(v, i_t);
@@ -32,7 +33,7 @@ void stencil_sweep_2d(
     for (size_t v = 0; v < u_in.get_nvars(); v++) {
         for (size_t i = istart; i < istop; i++) {
             for (size_t j = jstart; j < jstop; j++) {
-                double result = 0.0;
+                Real result = 0.0;
                 for (size_t w = 0; w < stencil.size(); w++) {
                     size_t i_t = i, j_t = j;
                     if (axis == 1) {    i_t += w - reach;}
@@ -63,7 +64,7 @@ void stencil_sweep_3d(
         for (size_t i = istart; i < istop; i++) {
             for (size_t j = jstart; j < jstop; j++) {
                 for (size_t k = kstart; k < kstop; k++) {
-                    double result = 0.0;
+                    Real result = 0.0;
                     for (size_t w = 0; w < stencil.size(); w++) {
                         size_t i_t = i, j_t = j, k_t = k;
                         if (axis == 1) {        i_t += w - reach;}

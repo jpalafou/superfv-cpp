@@ -1,13 +1,14 @@
 #pragma once
 #include "array.hpp"
+#include "common.hpp"
 #include "mesh.hpp"
 #include "boundary_conditions.hpp"
 
 enum Integrator {forward_euler, ssprk2, ssprk3, rk4};
 
-void update_fluxes(const Array& u, Array& f, Array& g, Array& h, int p, const BC_Params& bcparams, double gamma);
+void update_fluxes(const Array& u, Array& f, Array& g, Array& h, int p, const BC_Params& bcparams, Real gamma);
 
-double compute_dt(const Array& u, double cfl, double gamma, const UniformMeshParams& meshparams);
+Real compute_dt(const Array& u, Real cfl, Real gamma, const UniformMeshParams& meshparams);
 
 void take_step(
     const Array& uold,
@@ -15,10 +16,10 @@ void take_step(
     Array& f,
     Array& g,
     Array& h,
-    double dt,
+    Real dt,
     const UniformMeshParams& meshparams,
     const BC_Params& bcparams,
     int p,
     Integrator integrator,
-    double gamma
+    Real gamma
 );

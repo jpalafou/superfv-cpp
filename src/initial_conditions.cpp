@@ -1,5 +1,6 @@
 #include <stdexcept>
 #include "array.hpp"
+#include "common.hpp"
 #include "hydro.hpp"
 #include "initial_conditions.hpp"
 #include "mesh.hpp"
@@ -12,18 +13,18 @@ Array get_array_from_mesh(const UniformMeshParams& meshparams) {
     throw std::invalid_argument("ndim must be 1, 2, or 3.");
 }
 
-Array ic(const UniformMesh& mesh, Setup setup, double gamma, const std::vector<double>& params) {
+Array ic(const UniformMesh& mesh, Setup setup, Real gamma, const std::vector<Real>& params) {
     UniformMeshParams meshparams = mesh.get_params();
     Array out = get_array_from_mesh(meshparams);
     size_t ndim = meshparams.ndim();
 
     if (ndim == 1) {
         for (int i = 0; i < meshparams.nx; i++) {
-            double rho = ic_func(mesh.x_centers()[i], 0.0, 0.0, Variable::rho, ndim, params, setup);
-            double vx  = ic_func(mesh.x_centers()[i], 0.0, 0.0, Variable::vx,  ndim, params, setup);
-            double vy  = ic_func(mesh.x_centers()[i], 0.0, 0.0, Variable::vy,  ndim, params, setup);
-            double vz  = ic_func(mesh.x_centers()[i], 0.0, 0.0, Variable::vz,  ndim, params, setup);
-            double P   = ic_func(mesh.x_centers()[i], 0.0, 0.0, Variable::P,   ndim, params, setup);
+            Real rho = ic_func(mesh.x_centers()[i], 0.0, 0.0, Variable::rho, ndim, params, setup);
+            Real vx  = ic_func(mesh.x_centers()[i], 0.0, 0.0, Variable::vx,  ndim, params, setup);
+            Real vy  = ic_func(mesh.x_centers()[i], 0.0, 0.0, Variable::vy,  ndim, params, setup);
+            Real vz  = ic_func(mesh.x_centers()[i], 0.0, 0.0, Variable::vz,  ndim, params, setup);
+            Real P   = ic_func(mesh.x_centers()[i], 0.0, 0.0, Variable::P,   ndim, params, setup);
             Primitives    primitive{rho, vx, vy, vz, P};
             Conservatives conserved = prim_to_cons(primitive, gamma);
             out(0, i) = conserved.rho;

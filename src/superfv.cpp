@@ -2,6 +2,7 @@
 #include <vector>
 #include "array.hpp"
 #include "boundary_conditions.hpp"
+#include "common.hpp"
 #include "initial_conditions.hpp"
 #include "initial_condition_defs.hpp"
 #include "mesh.hpp"
@@ -22,7 +23,7 @@ void print_1d_array(Array& arr) {
 }
 
 int main() {
-    double gamma = 1.4;
+    Real gamma = 1.4;
     UniformMeshParams meshparams = UniformMeshParams{0.0, 1.0, 8};
     BC_Params bcparams = BC_Params{2, BC::periodic, BC::none};
     UniformMesh mesh = UniformMesh(meshparams);
@@ -33,7 +34,7 @@ int main() {
     int p = 0;
     Integrator integrator = Integrator::forward_euler;
 
-    double dt = compute_dt(uold, 0.8, gamma, meshparams);
+    Real dt = compute_dt(uold, 0.8, gamma, meshparams);
     take_step(uold, unew, f, dummy, dummy, dt, meshparams, bcparams, p, integrator, gamma);
 
     std::cout << "uold\n";

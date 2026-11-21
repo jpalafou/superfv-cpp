@@ -1,15 +1,16 @@
 #include <cmath>
 #include <numbers>
 #include <stdexcept>
+#include "common.hpp"
 #include "initial_condition_defs.hpp"
 
-void validate_params(const std::vector<double>& params, size_t n) {
+void validate_params(const std::vector<Real>& params, size_t n) {
     if (!params.empty() && params.size() != n) {throw std::invalid_argument("params must be empty or have correct length.");}
 }
 
-double sinus(double x, double y, double z, Variable v, size_t ndim, const std::vector<double>& params) {
+Real sinus(Real x, Real y, Real z, Variable v, size_t ndim, const std::vector<Real>& params) {
     validate_params(params, 6);
-    double rho_max, rho_min, uniform_vx, uniform_vy, uniform_vz, uniform_P;
+    Real rho_max, rho_min, uniform_vx, uniform_vy, uniform_vz, uniform_P;
     if (params.empty()) {
         rho_max    = 2.0;
         rho_min    = 1.0;
@@ -27,11 +28,11 @@ double sinus(double x, double y, double z, Variable v, size_t ndim, const std::v
     }
     switch (v) {
         case Variable::rho: {
-            double r;
+            Real r;
             if      (ndim == 1) {r = x;}
             else if (ndim == 2) {r = x + y;}
             else                {r = x + y + z;}
-            return rho_min + (rho_max - rho_min) * (0.5 * std::sin(2.0 * std::numbers::pi * r) + 0.5);
+            return rho_min + (rho_max - rho_min) * (Real{0.5} * std::sin(Real{2} * Real{std::numbers::pi} * r) + Real{0.5});
         }
         case Variable::vx:
             return uniform_vx;
@@ -46,9 +47,9 @@ double sinus(double x, double y, double z, Variable v, size_t ndim, const std::v
     }
 }
 
-double square(double x, double y, double z, Variable v, size_t ndim, const std::vector<double>& params) {
+Real square(Real x, Real y, Real z, Variable v, size_t ndim, const std::vector<Real>& params) {
     validate_params(params, 6);
-    double rho_max, rho_min, uniform_vx, uniform_vy, uniform_vz, uniform_P;
+    Real rho_max, rho_min, uniform_vx, uniform_vy, uniform_vz, uniform_P;
     if (params.empty()) {
         rho_max    = 2.0;
         rho_min    = 1.0;
@@ -88,7 +89,7 @@ double square(double x, double y, double z, Variable v, size_t ndim, const std::
     }
 }
 
-double ic_func(double x, double y, double z, Variable v, size_t ndim, const std::vector<double>& params, Setup setup) {
+Real ic_func(Real x, Real y, Real z, Variable v, size_t ndim, const std::vector<Real>& params, Setup setup) {
     switch (setup) {
         case Setup::SINUS:
             return  sinus(x, y, z, v, ndim, params);
