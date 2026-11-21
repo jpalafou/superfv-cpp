@@ -3,9 +3,11 @@
 #include "array.hpp"
 #include "boundary_conditions.hpp"
 #include "common.hpp"
+#include "hydro.hpp"
 #include "initial_conditions.hpp"
 #include "initial_condition_defs.hpp"
 #include "mesh.hpp"
+#include "solver.hpp"
 #include "update.hpp"
 
 void print_1d_array(Array& arr) {
@@ -23,24 +25,15 @@ void print_1d_array(Array& arr) {
 }
 
 int main() {
-    Real gamma = 1.4;
-    UniformMeshParams meshparams = UniformMeshParams{0.0, 1.0, 8};
-    BC_Params bcparams = BC_Params{2, BC::periodic, BC::none};
-    UniformMesh mesh = UniformMesh(meshparams);
-    Array uold = ic(mesh, Setup::SQUARE, gamma);
-    Array f(uold.get_nvars(), uold.get_nx() + 1);
-    Array unew = get_empty_copy(uold);
-    Array dummy = Array();
-    int p = 0;
-    Integrator integrator = Integrator::forward_euler;
+    SolverParams params{
+        HydroParams{1.4, 0.8},
+        UniformMeshParams{0.0, 1.0, 16},
+        BC_Params{2, BC::periodic, BC::none},
+        1,
+        Integrator::ssprk2
+    };
+    Array u = hydro_solver(Setup::SQUARE, params, 0.000001);
 
-    Real dt = compute_dt(uold, 0.8, gamma, meshparams);
-    take_step(uold, unew, f, dummy, dummy, dt, meshparams, bcparams, p, integrator, gamma);
-
-    std::cout << "uold\n";
-    print_1d_array(uold);
-    std::cout << "f\n";
-    print_1d_array(f);
-    std::cout << "unew\n";
-    print_1d_array(unew);
+    std::cout << "u\n";
+    print_1d_array(u);
 }

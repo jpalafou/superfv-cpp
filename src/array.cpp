@@ -51,3 +51,16 @@ bool has_same_shape(const Array& arr1, const Array& arr2) {
 bool has_same_ndim(const Array& arr1, const Array& arr2) {return arr1.get_ndim() == arr2.get_ndim();}
 
 Array get_empty_copy(const Array& arr) {return Array(arr.get_nvars(), arr.get_nx(), arr.get_ny(), arr.get_nz());}
+
+void copy_contents(const Array& arr1, Array& arr2) {
+    if (!has_same_shape(arr1, arr2)) {throw std::invalid_argument("arr1 and arr2 must have same shape.");}
+    for (size_t v = 0; v < arr1.get_nvars(); v++) {
+        for (size_t i = 0; i < arr1.get_nx(); i++) {
+            for (size_t j = 0; j < arr1.get_ny(); j++) {
+                for (size_t k = 0; k < arr1.get_nz(); k++) {
+                    arr2(v, i, j, k) = arr1(v, i, j, k);
+                }
+            }
+        }
+    }
+}

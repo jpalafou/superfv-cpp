@@ -15,6 +15,7 @@ add_executable(superfv
     src/initial_conditions.cpp
     src/mesh.cpp
     src/riemann_solver.cpp
+    src/solver.cpp
     src/stencils.cpp
     src/sweep.cpp
     src/update.cpp
