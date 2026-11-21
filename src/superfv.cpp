@@ -23,7 +23,8 @@ void print_1d_array(Array& arr) {
 
 int main() {
     double gamma = 1.4;
-    UniformMeshParams meshparams = UniformMeshParams{2, 0.0, 1.0, 8};
+    UniformMeshParams meshparams = UniformMeshParams{0.0, 1.0, 8};
+    BC_Params bcparams = BC_Params{2, BC::periodic, BC::none};
     UniformMesh mesh = UniformMesh(meshparams);
     Array uold = ic(mesh, Setup::SQUARE, gamma);
     Array f(uold.get_nvars(), uold.get_nx() + 1);
@@ -33,7 +34,7 @@ int main() {
     Integrator integrator = Integrator::forward_euler;
 
     double dt = compute_dt(uold, 0.8, gamma, meshparams);
-    take_step(uold, unew, f, dummy, dummy, dt, meshparams, p, integrator, gamma);
+    take_step(uold, unew, f, dummy, dummy, dt, meshparams, bcparams, p, integrator, gamma);
 
     std::cout << "uold\n";
     print_1d_array(uold);

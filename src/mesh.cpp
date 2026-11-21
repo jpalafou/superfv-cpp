@@ -17,8 +17,7 @@ std::vector<double> linspace(double lower, double upper, size_t n){
     return out;
 }
 
-UniformMesh::UniformMesh(const UniformMeshParams params) {
-    params_ = params;
+UniformMesh::UniformMesh(const UniformMeshParams& params) : params_(params) {
     x_faces_ = linspace(params.xlim0, params.xlim1, params.nx + 1);
     y_faces_ = linspace(params.ylim0, params.ylim1, params.ny + 1);
     z_faces_ = linspace(params.zlim0, params.zlim1, params.nz + 1);

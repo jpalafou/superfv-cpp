@@ -121,29 +121,19 @@ void apply_bc_2d(Array& ubc, size_t nghost, BC x_lower, BC x_upper, BC y_lower, 
     }
 }
 
-void apply_bc(
-    const Array& u, 
-    Array& ubc, 
-    size_t nghost, 
-    BC x_lower,
-    BC x_upper,
-    BC y_lower,
-    BC y_upper,
-    BC z_lower,
-    BC z_upper
-) {
+void apply_bc(const Array& u, Array& ubc, const BC_Params& params) {
     if (!has_same_ndim(u, ubc)) {throw std::invalid_argument("u and ubc must have matching ndim");}
     switch (u.get_ndim()) {
         case 2:
-            copy_inner_1d(u, ubc, nghost);
-            apply_bc_1d(ubc, nghost, x_lower, x_upper);
+            copy_inner_1d(u, ubc, params.nghost);
+            apply_bc_1d(ubc, params.nghost, params.x_lower, params.x_upper);
             return;
         case 3:
-            copy_inner_2d(u, ubc, nghost);
-            apply_bc_2d(ubc, nghost, x_lower, x_upper, y_lower, y_upper);
+            copy_inner_2d(u, ubc, params.nghost);
+            apply_bc_2d(ubc, params.nghost, params.x_lower, params.x_upper, params.y_lower, params.y_upper);
             return;
         case 4:
-            copy_inner_3d(u, ubc, nghost);
+            copy_inner_3d(u, ubc, params.nghost);
             throw std::invalid_argument("apply_bc_3d is not implemented.");
         default:
             throw std::invalid_argument("u must have ndim 2, 3, or 4.");

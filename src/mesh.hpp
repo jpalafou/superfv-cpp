@@ -2,16 +2,15 @@
 #include <vector>
 
 struct UniformMeshParams {
-    size_t    nghost;
-    double     xlim0;
-    double     xlim1;
-    size_t        nx; 
-    double     ylim0 = 0.0; 
-    double     ylim1 = 1.0; 
-    size_t        ny = 1;
-    double     zlim0 = 0.0; 
-    double     zlim1 = 1.0;
-    size_t        nz = 1;
+    const double     xlim0;
+    const double     xlim1;
+    const size_t        nx; 
+    const double     ylim0 = 0.0; 
+    const double     ylim1 = 1.0; 
+    const size_t        ny = 1;
+    const double     zlim0 = 0.0; 
+    const double     zlim1 = 1.0;
+    const size_t        nz = 1;
 
     double hx() const;
     double hy() const;
@@ -21,7 +20,7 @@ struct UniformMeshParams {
 
 class UniformMesh {
     public:
-        UniformMesh(const UniformMeshParams params);
+        UniformMesh(const UniformMeshParams& params);
         const UniformMeshParams& get_params() const;
         const std::vector<double> x_centers() const;
         const std::vector<double> y_centers() const;
