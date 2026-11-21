@@ -17,15 +17,15 @@ const Stencil conservative_interpolation(int p, Position pos) {
             break;
         case 1:
             if (pos == Position::left) {
-                data.push_back(1.0 / 4.0);
+                data.push_back( Real{1.0} / Real{4.0});
                 data.push_back(1.0);
-                data.push_back(-1.0 / 4.0);
+                data.push_back(Real{-1.0} / Real{4.0});
             } else if (pos == Position::center) {
                 data.push_back(1.0);
             } else {
-                data.push_back(-1.0 / 4.0);
+                data.push_back(Real{-1.0} / Real{4.0});
                 data.push_back(1.0);
-                data.push_back(1.0 / 4.0);
+                data.push_back( Real{1.0} / Real{4.0});
             }
             break;
         default:
