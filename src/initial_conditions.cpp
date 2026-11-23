@@ -52,11 +52,11 @@ Array ic_1d(const UniformMesh& mesh, size_t p, Setup setup, Real gamma, const st
             Real x = mesh.x_centers()[i] + (quadrature.x[q] * hx / (Real{2}));
             Real w = quadrature.w[q] / Real{2};
             Primitives primitive_node{
-                ic_func(mesh.x_centers()[i], 0.0, 0.0, Variable::rho, ndim, params, setup),
-                ic_func(mesh.x_centers()[i], 0.0, 0.0,  Variable::vx, ndim, params, setup),
-                ic_func(mesh.x_centers()[i], 0.0, 0.0,  Variable::vy, ndim, params, setup),
-                ic_func(mesh.x_centers()[i], 0.0, 0.0,  Variable::vz, ndim, params, setup),
-                ic_func(mesh.x_centers()[i], 0.0, 0.0,   Variable::P, ndim, params, setup)
+                ic_func(x, 0.0, 0.0, Variable::rho, ndim, params, setup),
+                ic_func(x, 0.0, 0.0,  Variable::vx, ndim, params, setup),
+                ic_func(x, 0.0, 0.0,  Variable::vy, ndim, params, setup),
+                ic_func(x, 0.0, 0.0,  Variable::vz, ndim, params, setup),
+                ic_func(x, 0.0, 0.0,   Variable::P, ndim, params, setup)
             };
             Conservatives conservative_node = prim_to_cons(primitive_node, gamma);
             rho_ave += w * conservative_node.rho;
