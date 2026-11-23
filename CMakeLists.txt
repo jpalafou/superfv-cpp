@@ -14,6 +14,7 @@ add_executable(superfv
     src/initial_condition_defs.cpp
     src/initial_conditions.cpp
     src/mesh.cpp
+    src/quadrature.cpp
     src/riemann_solver.cpp
     src/solver.cpp
     src/stencils.cpp

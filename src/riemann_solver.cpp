@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cmath>
 #include "common.hpp"
 #include "hydro.hpp"
 
