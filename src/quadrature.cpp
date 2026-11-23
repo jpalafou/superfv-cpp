@@ -2,7 +2,7 @@
 #include "quadrature.hpp"
 
 namespace gauss_legendre {
-    Quadrature get(size_t n) {
+    const Quadrature& get(size_t n) {
         switch (n) {
             case 2:
                 return q2;
