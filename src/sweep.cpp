@@ -1,9 +1,11 @@
+#include "sweep.hpp"
+
 #include <stdexcept>
 #include "array.hpp"
 #include "common.hpp"
 #include "stencils.hpp"
 
-void stencil_sweep_1d(const Array& u_in, Array& u_out, const Stencil& stencil, size_t istart = 0) {
+void stencil_sweep_1d(const Array& u_in, Array& u_out, const Stencil& stencil, size_t istart) {
     const size_t istop = istart + u_out.get_nx();
     const size_t reach = stencil.left_reach();
     for (size_t v = 0; v < u_in.get_nvars(); v++) {

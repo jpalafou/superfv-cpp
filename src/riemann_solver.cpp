@@ -1,3 +1,5 @@
+#include "riemann_solver.hpp"
+
 #include <algorithm>
 #include <cmath>
 #include "common.hpp"

@@ -1,22 +1,23 @@
 #pragma once
+#include <cstddef>
 #include <vector>
 #include "common.hpp"
 
 struct UniformMeshParams {
     const Real   xlim0;
     const Real   xlim1;
-    const size_t    nx; 
+    const std::size_t nx;
     const Real   ylim0 = 0.0; 
     const Real   ylim1 = 1.0; 
-    const size_t    ny = 1;
+    const std::size_t ny = 1;
     const Real   zlim0 = 0.0; 
     const Real   zlim1 = 1.0;
-    const size_t    nz = 1;
+    const std::size_t nz = 1;
 
     Real hx() const;
     Real hy() const;
     Real hz() const;
-    size_t ndim() const;
+    std::size_t ndim() const;
 };
 
 class UniformMesh {

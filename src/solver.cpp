@@ -1,3 +1,5 @@
+#include "solver.hpp"
+
 #include "array.hpp"
 #include "common.hpp"
 #include "hydro.hpp"
@@ -5,7 +7,7 @@
 #include "initial_conditions.hpp"
 #include "initial_condition_defs.hpp"
 #include "mesh.hpp"
-#include "solver.hpp"
+#include "ode.hpp"
 
 Array superfv(Setup setup, const SolverParams& params, Real tstop) {
     UniformMesh mesh = UniformMesh(params.mesh);

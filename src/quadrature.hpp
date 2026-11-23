@@ -1,5 +1,5 @@
 #pragma once
-#include <algorithm>
+#include <cstddef>
 #include <cmath>
 #include <vector>
 #include "common.hpp"
@@ -43,5 +43,5 @@ namespace gauss_legendre {
             Real{18 - std::sqrt(Real{30})} / Real{36}
         }
     };
-    const Quadrature& get(size_t n);
+    const Quadrature& get(std::size_t n);
 }

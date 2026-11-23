@@ -1,3 +1,5 @@
+#include "ode.hpp"
+
 #include <stdexcept>
 #include "array.hpp"
 #include "common.hpp"

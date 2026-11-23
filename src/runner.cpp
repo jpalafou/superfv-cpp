@@ -1,10 +1,8 @@
+#include <cstddef>
 #include <iostream>
-#include <vector>
 #include "array.hpp"
 #include "boundary_conditions.hpp"
-#include "common.hpp"
 #include "hydro.hpp"
-#include "initial_conditions.hpp"
 #include "initial_condition_defs.hpp"
 #include "mesh.hpp"
 #include "solver.hpp"

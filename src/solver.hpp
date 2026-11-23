@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "array.hpp"
 #include "boundary_conditions.hpp"
 #include "common.hpp"
@@ -11,7 +12,7 @@ struct SolverParams{
     const HydroParams& hydro;
     const UniformMeshParams& mesh;
     const BC_Params& bc;
-    size_t p;
+    std::size_t p;
     Integrator integrator;
 };
 

@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include <initializer_list>
 #include <vector>
 #include "common.hpp"
@@ -9,9 +10,9 @@ struct Stencil{
     Stencil(std::vector<Real> weights_vector);
     Stencil(std::initializer_list<Real> values);
     const Real& operator[](std::size_t i) const;
-    size_t        size() const;
-    size_t  left_reach() const;
-    size_t right_reach() const;
+    std::size_t        size() const;
+    std::size_t  left_reach() const;
+    std::size_t right_reach() const;
 };
 
 enum Position {left, center, right};
@@ -95,5 +96,5 @@ namespace conservative_interpolation{
         inline const Stencil p6{std::vector<Real>(left::p6.weights.rbegin(), left::p6.weights.rend())};
         inline const Stencil p7{std::vector<Real>(left::p7.weights.rbegin(), left::p7.weights.rend())};
     }
-    const Stencil& get(Position pos, size_t p);
+    const Stencil& get(Position pos, std::size_t p);
 }

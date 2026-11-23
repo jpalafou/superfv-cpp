@@ -6,10 +6,10 @@
 class Array {
     public:
         Array();
-        Array(size_t n1);
-        Array(size_t n1, size_t n2);
-        Array(size_t n1, size_t n2, size_t n3);
-        Array(size_t n1, size_t n2, size_t n3, size_t n4);
+        Array(std::size_t n1);
+        Array(std::size_t n1, std::size_t n2);
+        Array(std::size_t n1, std::size_t n2, std::size_t n3);
+        Array(std::size_t n1, std::size_t n2, std::size_t n3, std::size_t n4);
         Real& operator()(std::size_t v);
         Real& operator()(std::size_t v, std::size_t i);
         Real& operator()(std::size_t v, std::size_t i, std::size_t j);

@@ -1,5 +1,7 @@
-#include <cstddef>
 #include "array.hpp"
+
+#include <cstddef>
+#include <stdexcept>
 #include "common.hpp"
 
 Array::Array()                                              : nvars(0),  nx(0),  ny(0),  nz(0),  data(0) {}

@@ -1,12 +1,14 @@
-#include <stdexcept>
+#include "hydro_rhs.hpp"
+
 #include <algorithm>
+#include <cmath>
+#include <stdexcept>
 #include "array.hpp"
 #include "boundary_conditions.hpp"
 #include "common.hpp"
 #include "hydro.hpp"
 #include "mesh.hpp"
 #include "riemann_solver.hpp"
-#include "solver.hpp"
 #include "stencils.hpp"
 #include "sweep.hpp"
 

@@ -1,9 +1,10 @@
-#include <iterator>
+#include "initial_conditions.hpp"
+
 #include <stdexcept>
 #include "array.hpp"
 #include "common.hpp"
 #include "hydro.hpp"
-#include "initial_conditions.hpp"
+#include "initial_condition_defs.hpp"
 #include "mesh.hpp"
 #include "quadrature.hpp"
 

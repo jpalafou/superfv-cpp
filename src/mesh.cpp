@@ -1,6 +1,8 @@
+#include "mesh.hpp"
+
+#include <stdexcept>
 #include <vector>
 #include "common.hpp"
-#include "mesh.hpp"
 
 Real UniformMeshParams::hx()   const {return (xlim1 - xlim0) / static_cast<Real>(nx);}
 Real UniformMeshParams::hy()   const {return (ylim1 - ylim0) / static_cast<Real>(ny);}
