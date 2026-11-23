@@ -28,9 +28,9 @@ int main() {
     SolverParams params{
         HydroParams{1.4, 0.8},
         UniformMeshParams{0.0, 1.0, 16},
-        BC_Params{2, BC::periodic, BC::none},
-        1,
-        Integrator::ssprk2
+        BC_Params{3, BC::periodic, BC::none},
+        3,
+        Integrator::ssprk3
     };
     Array u = superfv(Setup::SQUARE, params, 0.000001);
 

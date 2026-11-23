@@ -25,6 +25,14 @@ namespace conservative_interpolation{
                         return left::p2;
                     case 3:
                         return left::p3;
+                    case 4:
+                        return left::p4;
+                    case 5:
+                        return left::p5;
+                    case 6:
+                        return left::p6;
+                    case 7:
+                        return left::p7;
                     default:
                         throw std::invalid_argument("unsupported p for left conservative interpolation stencil.");
                 }
@@ -37,6 +45,12 @@ namespace conservative_interpolation{
                     case 2:
                     case 3:
                         return center::p2_3;
+                    case 4:
+                    case 5:
+                        return center::p4_5;
+                    case 6:
+                    case 7:
+                        return center::p6_7;
                     default:
                         throw std::invalid_argument("unsupported p for center conservative interpolation stencil.");
                 }
@@ -51,6 +65,14 @@ namespace conservative_interpolation{
                         return right::p2;
                     case 3:
                         return right::p3;
+                    case 4:
+                        return right::p4;
+                    case 5:
+                        return right::p5;
+                    case 6:
+                        return right::p6;
+                    case 7:
+                        return right::p7;
                     default:
                         throw std::invalid_argument("unsupported p for right conservative interpolation stencil.");
                 }
