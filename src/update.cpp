@@ -14,8 +14,8 @@
 void update_1d_fluxes(const Array& upad, Array& f, int p, size_t nghost, Real gamma) {
     Array ul = get_empty_copy(upad);
     Array ur = get_empty_copy(upad);
-    Stencil  left = conservative_interpolation(p, Position::left);
-    Stencil right = conservative_interpolation(p, Position::right);
+    Stencil  left = conservative_interpolation::get(Position::left,  p);
+    Stencil right = conservative_interpolation::get(Position::right, p);
     size_t reach = left.left_reach();
 
     // interpolate left and right faces
