@@ -1,6 +1,7 @@
 #include "array.hpp"
 #include "common.hpp"
 #include "hydro.hpp"
+#include "hydro_rhs.hpp"
 #include "initial_conditions.hpp"
 #include "initial_condition_defs.hpp"
 #include "mesh.hpp"

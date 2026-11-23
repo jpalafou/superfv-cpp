@@ -5,7 +5,7 @@
 #include "hydro.hpp"
 #include "initial_condition_defs.hpp"
 #include "mesh.hpp"
-#include "update.hpp"
+#include "ode.hpp"
 
 struct SolverParams{
     const HydroParams& hydro;

@@ -8,7 +8,7 @@
 #include "initial_condition_defs.hpp"
 #include "mesh.hpp"
 #include "solver.hpp"
-#include "update.hpp"
+#include "ode.hpp"
 
 void print_1d_array(Array& arr) {
     std::cout <<         "rho: ";
