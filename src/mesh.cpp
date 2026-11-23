@@ -27,9 +27,9 @@ UniformMesh::UniformMesh(const UniformMeshParams& params) : params_(params) {
     for (size_t k = 0; k < params.nz; k++) {z_centers_.push_back((z_faces_[k] + z_faces_[k+1]) / Real{2});}
 }
 const UniformMeshParams& UniformMesh::get_params() const {return params_;}
-const std::vector<Real> UniformMesh::x_centers() const {return x_centers_;}
-const std::vector<Real> UniformMesh::y_centers() const {return y_centers_;}
-const std::vector<Real> UniformMesh::z_centers() const {return z_centers_;}
-const std::vector<Real>   UniformMesh::x_faces() const {return   x_faces_;}
-const std::vector<Real>   UniformMesh::y_faces() const {return   y_faces_;}
-const std::vector<Real>   UniformMesh::z_faces() const {return   z_faces_;}
+const std::vector<Real>& UniformMesh::x_centers() const {return x_centers_;}
+const std::vector<Real>& UniformMesh::y_centers() const {return y_centers_;}
+const std::vector<Real>& UniformMesh::z_centers() const {return z_centers_;}
+const std::vector<Real>&   UniformMesh::x_faces() const {return   x_faces_;}
+const std::vector<Real>&   UniformMesh::y_faces() const {return   y_faces_;}
+const std::vector<Real>&   UniformMesh::z_faces() const {return   z_faces_;}
