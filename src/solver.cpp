@@ -9,9 +9,9 @@
 #include "mesh.hpp"
 #include "ode.hpp"
 
-Array superfv(Setup setup, const SolverParams& params, Real tstop) {
+Array superfv(const SolverParams& params) {
     UniformMesh mesh = UniformMesh(params.mesh);
-    Array uold = ic(mesh, params.p, setup, params.hydro.gamma);
+    Array uold = ic(mesh, params.p, params.setup, params.hydro.gamma);
     Array f(uold.get_nvars(), uold.get_nx() + 1, uold.get_ny(), uold.get_nz());
     Array g, h;
     if (params.mesh.ndim() >= 2) {
@@ -25,11 +25,11 @@ Array superfv(Setup setup, const SolverParams& params, Real tstop) {
 
     while (true) {
         bool stop = false;
-        Real dt = compute_dt(uold, 0.8, params.hydro.gamma, params.mesh);
-        if (t + dt > tstop) {dt = tstop - t; stop=true;};
+        Real dt = compute_dt(uold, params.hydro.cfl, params.hydro.gamma, params.mesh);
+        if (t + dt > params.tstop) {dt = params.tstop - t; stop=true;};
         take_step(uold, unew, f, g, h, dt, params);
         t += dt;
-        if (t >= tstop || stop) {break;}
+        if (t >= params.tstop || stop) {break;}
         copy_contents(unew, uold);
     }
 

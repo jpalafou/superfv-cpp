@@ -9,11 +9,13 @@
 #include "ode.hpp"
 
 struct SolverParams{
-    const HydroParams& hydro;
-    const UniformMeshParams& mesh;
-    const BC_Params& bc;
-    std::size_t p;
-    Integrator integrator;
+    const HydroParams hydro;
+    const UniformMeshParams mesh;
+    const BC_Params bc;
+    const std::size_t p;
+    const Integrator integrator;
+    const Setup setup;
+    const Real tstop;
 };
 
-Array superfv(Setup ic, const SolverParams& params, Real t);
+Array superfv(const SolverParams& params);

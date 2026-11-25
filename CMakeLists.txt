@@ -1,6 +1,6 @@
 # from the project root:
 #   build:  cmake -S . -B build && cmake --build build
-#   run:    ./build/superfv
+#   run:    ./build/superfv configs/square.cfg
 #   clean:  cmake --build build --target clean
 
 cmake_minimum_required(VERSION 4.3)
@@ -10,6 +10,7 @@ add_executable(superfv
     src/runner.cpp
     src/array.cpp
     src/boundary_conditions.cpp
+    src/config.cpp
     src/hydro.cpp
     src/hydro_rhs.cpp
     src/initial_condition_defs.cpp

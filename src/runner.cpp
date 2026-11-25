@@ -1,12 +1,7 @@
-#include <cstddef>
 #include <iostream>
 #include "array.hpp"
-#include "boundary_conditions.hpp"
-#include "hydro.hpp"
-#include "initial_condition_defs.hpp"
-#include "mesh.hpp"
+#include "config.hpp"
 #include "solver.hpp"
-#include "ode.hpp"
 
 void print_1d_array(Array& arr) {
     std::cout <<         "rho: ";
@@ -22,15 +17,13 @@ void print_1d_array(Array& arr) {
     std::cout << "\n";
 }
 
-int main() {
-    SolverParams params{
-        HydroParams{1.4, 0.8},
-        UniformMeshParams{0.0, 1.0, 16},
-        BC_Params{3, BC::periodic, BC::none},
-        3,
-        Integrator::ssprk3
-    };
-    Array u = superfv(Setup::SQUARE, params, 0.000001);
+int main(int argc, char* argv[]) {
+    if (argc != 2) {
+        std::cerr << "Usage: " << argv[0] << " <problem.cfg>\n";
+        return 1;
+    }
+    const SolverParams params = read_config(argv[1]);
+    Array u = superfv(params);
 
     std::cout << "u\n";
     print_1d_array(u);
