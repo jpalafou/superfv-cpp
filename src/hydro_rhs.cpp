@@ -126,9 +126,10 @@ void update_dudt(Array& dudt, const Array& f, const Array& g, const Array& h, co
 Real compute_1d_dt(const Array& u, Real cfl, Real gamma, Real hx) {
     Real max_speed_over_length = 0.0;
     for (size_t i = 0; i < u.get_nx(); i++) {
-        Primitives w = Primitives{u(0, i), u(1, i), u(2, i), u(3, i), u(4, i)};
-        Real s = prim_to_cs(w, gamma);
-        s += std::abs(w.v1);
+        Conservatives cons{u(0, i), u(1, i), u(2, i), u(3, i), u(4, i)};
+        Primitives prim = cons_to_prim(cons, gamma);
+        Real s = prim_to_cs(prim, gamma);
+        s += std::abs(prim.v1);
         max_speed_over_length = std::max(s / hx, max_speed_over_length);
     }
     if (max_speed_over_length == 0.0) {throw std::runtime_error("cannot compute hydro dt with 0 velocity.");}
@@ -140,10 +141,11 @@ Real compute_2d_dt(const Array& u, Real cfl, Real gamma, Real hx, Real hy) {
     Real max_speed_over_length_sum = 0.0;
     for (size_t i = 0; i < u.get_nx(); i++) {
         for (size_t j = 0; i < u.get_ny(); j++) {
-            Primitives w = Primitives{u(0, i, j), u(1, i, j), u(2, i, j), u(3, i, j), u(4, i, j)};
-            Real cs = prim_to_cs(w, gamma);
-            Real speed_over_length_sum = (std::abs(w.v1) + cs) / hx;
-            speed_over_length_sum       += (std::abs(w.v2) + cs) / hy;
+            Conservatives cons{u(0, i, j), u(1, i, j), u(2, i, j), u(3, i, j), u(4, i, j)};
+            Primitives prim = cons_to_prim(cons, gamma);
+            Real cs = prim_to_cs(prim, gamma);
+            Real speed_over_length_sum = (std::abs(prim.v1) + cs) / hx;
+            speed_over_length_sum       += (std::abs(prim.v2) + cs) / hy;
             if (speed_over_length_sum > max_speed_over_length_sum) {
                 max_speed_over_length_sum = speed_over_length_sum;
             }
@@ -164,11 +166,12 @@ Real compute_3d_dt(const Array& u, Real cfl, Real gamma, Real hx, Real hy, Real 
                 Real  my = u(2, i, j, k);
                 Real  mz = u(3, i, j, k);
                 Real   P = u(4, i, j, k);
-                Primitives w = Primitives{rho, mx, my, mz, P};
-                Real cs = prim_to_cs(w, gamma);
-                Real speed_over_length_sum = (std::abs(w.v1) + cs) / hx;
-                speed_over_length_sum       += (std::abs(w.v2) + cs) / hy;
-                speed_over_length_sum       += (std::abs(w.v3) + cs) / hz;
+                Conservatives cons{rho, mx, my, mz, P};
+                Primitives prim = cons_to_prim(cons, gamma);
+                Real cs = prim_to_cs(prim, gamma);
+                Real speed_over_length_sum =   (std::abs(prim.v1) + cs) / hx;
+                speed_over_length_sum       += (std::abs(prim.v2) + cs) / hy;
+                speed_over_length_sum       += (std::abs(prim.v3) + cs) / hz;
                 if (speed_over_length_sum > max_speed_over_length_sum) {
                     max_speed_over_length_sum = speed_over_length_sum;
                 }
