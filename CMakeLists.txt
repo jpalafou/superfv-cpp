@@ -1,5 +1,5 @@
 # from the project root:
-#   build:  cmake -S . -B build && cmake --build build
+#   build:  cmake --fresh -S . -B build && cmake --build build
 #   run:    ./build/superfv configs/square.cfg
 #   clean:  cmake --build build --target clean
 

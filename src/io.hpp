@@ -5,6 +5,7 @@
 #include <vector>
 #include "array.hpp"
 #include "common.hpp"
+#include "mesh.hpp"
 
 struct IOParams {
     const std::size_t fprint;
@@ -26,5 +27,7 @@ void printer(const StepSummary& step_summary, Real Eref);
 
 std::vector<Real> get_snapshot_schedule(Real tstop, std::size_t nout);
 
-// Binary layout: t followed by u in (variable, x, y, z) order, all stored as Real.
-void write_snapshot(const std::filesystem::path& output_dir, const Array& u, Real t, std::size_t n);
+// Binary layout (native byte order): nx, ny, nz as uint64_t; then
+// xlim0, xlim1, ylim0, ylim1, zlim0, zlim1, t, and u as Real.
+// u is stored in (variable, x, y, z) order.
+void write_snapshot(const std::filesystem::path& output_dir, const Array& u, const UniformMeshParams& mesh, Real t, std::size_t n);

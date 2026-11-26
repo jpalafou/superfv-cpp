@@ -31,7 +31,7 @@ Array superfv(const SolverParams& params) {
     step_log.push_back(get_step_summary(uold, step_number, t));
     if (params.io.fprint > 0) {printer(step_log.back(), step_log.front().Etotal);}
     if (!snapshot_schedule.empty() && snapshot_schedule.front() == 0) {
-        write_snapshot(params.io.output_dir, uold, t, snapshot_idx);
+        write_snapshot(params.io.output_dir, uold, params.mesh, t, snapshot_idx);
         snapshot_schedule.erase(snapshot_schedule.begin());
         snapshot_idx++;
     }
@@ -55,7 +55,7 @@ Array superfv(const SolverParams& params) {
             while (!snapshot_schedule.empty() && snapshot_schedule.front() <= t) {
                 snapshot_schedule.erase(snapshot_schedule.begin());
             }
-            write_snapshot(params.io.output_dir, unew, t, snapshot_idx);
+            write_snapshot(params.io.output_dir, unew, params.mesh, t, snapshot_idx);
             snapshot_idx++;
         }
         if (stop) {break;}

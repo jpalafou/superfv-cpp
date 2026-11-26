@@ -1,6 +1,7 @@
 #include "io.hpp"
 
 #include <cstddef>
+#include <cstdint>
 #include <filesystem>
 #include <format>
 #include <fstream>
@@ -45,12 +46,20 @@ std::vector<Real> get_snapshot_schedule(Real tstop, std::size_t nout) {
     return {};
 }
 
-void write_snapshot(const std::filesystem::path& output_dir, const Array& u, Real t, std::size_t n) {
+void write_snapshot(const std::filesystem::path& output_dir, const Array& u, const UniformMeshParams& mesh, Real t, std::size_t n) {
     std::filesystem::create_directories(output_dir);
     const auto path = output_dir / std::format("snapshot_{}.bin", n);
     std::ofstream file(path, std::ios::binary);
     if (!file) {throw std::runtime_error("cannot open snapshot: " + path.string());}
 
+    const std::uint64_t dimensions[] = {
+        static_cast<std::uint64_t>(mesh.nx),
+        static_cast<std::uint64_t>(mesh.ny),
+        static_cast<std::uint64_t>(mesh.nz)
+    };
+    const Real bounds[] = {mesh.xlim0, mesh.xlim1, mesh.ylim0, mesh.ylim1, mesh.zlim0, mesh.zlim1};
+    file.write(reinterpret_cast<const char*>(dimensions), sizeof(dimensions));
+    file.write(reinterpret_cast<const char*>(bounds), sizeof(bounds));
     file.write(reinterpret_cast<const char*>(&t), sizeof(t));
     const auto size = u.get_nvars() * u.get_nx() * u.get_ny() * u.get_nz();
     if (size > 0) {

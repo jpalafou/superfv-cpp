@@ -8,6 +8,6 @@
         `nout=1`: write output from last step only
         `nout=2`: write output from initial condition and last step
         `nout>2`: write output from linspace of steps from `t=0` to `t=tstop`
-[ ] add mesh to snapshot
+[x] add mesh to snapshot
 [ ] `std::size_t compute_nghost(std::size_t p)`
 [ ] `struct SchemeParams {const std::size_t p; const std::size_t nrev};`

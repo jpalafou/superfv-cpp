@@ -1,6 +1,8 @@
-.vscode/
 build/
 out/
+.vscode/
+**/__pycache__
+**/*.egg-info
 
 *.log
 *.out
