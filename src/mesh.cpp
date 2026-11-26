@@ -1,24 +1,13 @@
 #include "mesh.hpp"
 
-#include <stdexcept>
 #include <vector>
 #include "common.hpp"
+#include "utils.hpp"
 
 Real UniformMeshParams::hx()   const {return (xlim1 - xlim0) / static_cast<Real>(nx);}
 Real UniformMeshParams::hy()   const {return (ylim1 - ylim0) / static_cast<Real>(ny);}
 Real UniformMeshParams::hz()   const {return (zlim1 - zlim0) / static_cast<Real>(nz);}
 size_t UniformMeshParams::ndim() const {if (nz > 1) {return 3;} else if (ny > 1) {return 2;} else {return 1;}}
-
-std::vector<Real> linspace(Real lower, Real upper, size_t n){
-    std::vector<Real> out;
-    if (n < 2) {throw std::invalid_argument("n must be greater than 1.");}
-    Real h = (upper - lower) / (n - 1);
-    for(int i = 0; i < n - 1; ++i) {
-        out.push_back(lower + h * i);
-    }
-    out.push_back(upper); 
-    return out;
-}
 
 UniformMesh::UniformMesh(const UniformMeshParams& params) : params_(params) {
     x_faces_ = linspace(params.xlim0, params.xlim1, params.nx + 1);

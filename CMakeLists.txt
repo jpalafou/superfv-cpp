@@ -23,6 +23,7 @@ add_executable(superfv
     src/solver.cpp
     src/stencils.cpp
     src/sweep.cpp
+    src/utils.cpp
 )
 set(SUPERFV_REAL_TYPE "double" CACHE STRING "Floating-point type")
 target_compile_definitions(superfv PRIVATE

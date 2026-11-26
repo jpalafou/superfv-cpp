@@ -25,8 +25,17 @@ Array superfv(const SolverParams& params) {
     Real t = 0;
     std::size_t step_number = 0;
     std::vector<StepSummary> step_log;
+    std::size_t snapshot_idx = 0;
+    std::vector<Real> snapshot_schedule = get_snapshot_schedule(params.tstop, params.io.nout);
 
     step_log.push_back(get_step_summary(uold, step_number, t));
+    if (params.io.fprint > 0) {printer(step_log.back(), step_log.front().Etotal);}
+    if (!snapshot_schedule.empty() && snapshot_schedule.front() == 0) {
+        write_snapshot(params.io.output_dir, uold, t, snapshot_idx);
+        snapshot_schedule.erase(snapshot_schedule.begin());
+        snapshot_idx++;
+    }
+
     while (true) {
         bool stop = false;
         
@@ -41,6 +50,13 @@ Array superfv(const SolverParams& params) {
         if (t >= params.tstop || step_number >= params.max_steps) {stop=true;}
         if (params.io.fprint > 0 && (step_number % params.io.fprint == 0 || stop)) {
             printer(step_log.back(), step_log.front().Etotal);
+        }
+        if (!snapshot_schedule.empty() && (snapshot_schedule.front() <= t || stop)) {
+            while (!snapshot_schedule.empty() && snapshot_schedule.front() <= t) {
+                snapshot_schedule.erase(snapshot_schedule.begin());
+            }
+            write_snapshot(params.io.output_dir, unew, t, snapshot_idx);
+            snapshot_idx++;
         }
         if (stop) {break;}
         
