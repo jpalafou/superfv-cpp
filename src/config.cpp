@@ -1,9 +1,12 @@
 #include "config.hpp"
 
-#include <cmath>
+#include <cstddef>
 #include <fstream>
+#include <limits>
 #include <sstream>
 #include <stdexcept>
+#include <string>
+#include "io.hpp"
 
 namespace {
     struct Config {
@@ -16,22 +19,24 @@ namespace {
         Real tstop = -1.0;
 
         // optional config members and their defaults.
-        Real cfl = 0.8;
-        Real gamma = 1.4;
-        size_t ny = 1;
-        size_t nz = 1;
-        std::string x_lower = "periodic";
-        std::string x_upper = "none";
-        Real xlim0 = 0.0;
-        Real xlim1 = 1.0;
-        std::string y_lower = "periodic";
-        std::string y_upper = "none";
-        Real ylim0 = 0.0;
-        Real ylim1 = 1.0;
-        std::string z_lower = "periodic";
-        std::string z_upper = "none";
-        Real zlim0 = 0.0;
-        Real zlim1 = 1.0;
+        Real             cfl = 0.8;
+        std::size_t      fprint = 0;
+        Real             gamma = 1.4;
+        std::size_t      max_steps =  std::numeric_limits<std::size_t>::max();
+        std::size_t      ny = 1;
+        std::size_t      nz = 1;
+        std::string      x_lower = "periodic";
+        std::string      x_upper = "none";
+        Real             xlim0 = 0.0;
+        Real             xlim1 = 1.0;
+        std::string      y_lower = "periodic";
+        std::string      y_upper = "none";
+        Real             ylim0 = 0.0;
+        Real             ylim1 = 1.0;
+        std::string      z_lower = "periodic";
+        std::string      z_upper = "none";
+        Real             zlim0 = 0.0;
+        Real             zlim1 = 1.0;
     };
 
     SolverParams make_solver_params(const Config& config) {
@@ -77,14 +82,17 @@ namespace {
             .z_lower = parse_bc(config.z_lower),
             .z_upper = parse_bc(config.z_upper)
         };
+        const IOParams io{.fprint=config.fprint};
         return {
             .hydro = hydro,
             .mesh = mesh,
             .bc = bc,
+            .io = io,
             .p = static_cast<std::size_t>(config.p),
             .integrator = integrator,
             .setup = setup,
-            .tstop = config.tstop
+            .tstop = config.tstop,
+            .max_steps = config.max_steps
         };
     }
 
@@ -112,8 +120,10 @@ SolverParams read_config(const std::string& path) {
         const std::string key = trim(line.substr(0, equal));
         std::istringstream input(line.substr(equal + 1));
         if      (key == "cfl") {input >> config.cfl;}
+        else if (key == "fprint") {input >> config.fprint;}
         else if (key == "gamma") {input >> config.gamma;}
         else if (key == "integrator") {input >> config.integrator;}
+        else if (key == "max_steps") {input >> config.max_steps;}
         else if (key == "nghost") {input >> config.nghost;}
         else if (key == "nx") {input >> config.nx;}
         else if (key == "ny") {input >> config.ny;}

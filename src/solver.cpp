@@ -1,11 +1,12 @@
 #include "solver.hpp"
 
+#include <cstddef>
+#include <vector>
 #include "array.hpp"
 #include "common.hpp"
-#include "hydro.hpp"
 #include "hydro_rhs.hpp"
 #include "initial_conditions.hpp"
-#include "initial_condition_defs.hpp"
+#include "io.hpp"
 #include "mesh.hpp"
 #include "ode.hpp"
 
@@ -22,14 +23,27 @@ Array superfv(const SolverParams& params) {
     }
     Array unew = get_empty_copy(uold);
     Real t = 0;
+    std::size_t step_number = 0;
+    std::vector<StepSummary> step_log;
 
+    step_log.push_back(get_step_summary(uold, step_number, t));
     while (true) {
         bool stop = false;
+        
         Real dt = compute_dt(uold, params.hydro.cfl, params.hydro.gamma, params.mesh);
         if (t + dt > params.tstop) {dt = params.tstop - t; stop=true;};
+        
         take_step(uold, unew, f, g, h, dt, params);
         t += dt;
-        if (t >= params.tstop || stop) {break;}
+        step_number++;
+        step_log.push_back(get_step_summary(unew, step_number, t));
+        
+        if (t >= params.tstop || step_number >= params.max_steps) {stop=true;}
+        if (params.io.fprint > 0 && (step_number % params.io.fprint == 0 || stop)) {
+            printer(step_log.back(), step_log.front().Etotal);
+        }
+        if (stop) {break;}
+        
         copy_contents(unew, uold);
     }
 

@@ -15,6 +15,7 @@ add_executable(superfv
     src/hydro_rhs.cpp
     src/initial_condition_defs.cpp
     src/initial_conditions.cpp
+    src/io.cpp
     src/mesh.cpp
     src/ode.cpp
     src/quadrature.cpp

@@ -25,6 +25,6 @@ int main(int argc, char* argv[]) {
     const SolverParams params = read_config(argv[1]);
     Array u = superfv(params);
 
-    std::cout << "u\n";
-    print_1d_array(u);
+    // std::cout << "u\n";
+    // print_1d_array(u);
 }
