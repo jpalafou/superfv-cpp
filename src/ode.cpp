@@ -82,7 +82,7 @@ void ssprk3_step(const Array& uold, Array& unew, Array& f, Array& g, Array& h, R
         for (size_t i = 0; i < uold.get_nx(); i++) {
             for (size_t j = 0; j < uold.get_ny(); j++) {
                 for (size_t k = 0; k < uold.get_nz(); k++) {
-                    Real dudt_sum_term = dut0(v, i, j, k) + dut1(v, i, j, k) + (Real{2} * dut2(v, i, j, k));
+                    Real dudt_sum_term = dut0(v, i, j, k) + dut1(v, i, j, k) + (Real{4} * dut2(v, i, j, k));
                     unew(v, i, j, k)  = uold(v, i, j, k) + (dt * dudt_sum_term / Real{6});
                 }
             }
