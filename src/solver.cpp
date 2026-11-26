@@ -10,6 +10,36 @@
 #include "mesh.hpp"
 #include "ode.hpp"
 
+namespace {
+    void call_printer_when_appropriate(
+        const std::vector<StepSummary>& step_log,
+        const IOParams& params,
+        bool stop
+    ) {
+        size_t step_number = step_log.back().step_number;
+        if (params.fprint > 0 && (step_number % params.fprint == 0 || stop)) {
+            printer(step_log.back(), step_log.front().Etotal);
+        }
+    }
+
+    void call_snapshot_writer_when_appropriate(
+        const Array& u,
+        std::vector<Real>& snapshot_schedule,
+        size_t& snapshot_idx,
+        Real t,
+        const SolverParams& params,
+        bool stop
+    ) {
+        if (!snapshot_schedule.empty() && (snapshot_schedule.front() <= t || stop)) {
+            while (!snapshot_schedule.empty() && snapshot_schedule.front() <= t) {
+                snapshot_schedule.erase(snapshot_schedule.begin());
+            }
+            write_snapshot(params.io.output_dir, u, params.mesh, t, snapshot_idx);
+            snapshot_idx++;
+        }
+    }
+}
+
 Array superfv(const SolverParams& params) {
     UniformMesh mesh = UniformMesh(params.mesh);
     Array uold = ic(mesh, params.p, params.setup, params.hydro.gamma);
@@ -24,17 +54,12 @@ Array superfv(const SolverParams& params) {
     Array unew = get_empty_copy(uold);
     Real t = 0;
     std::size_t step_number = 0;
-    std::vector<StepSummary> step_log;
+    std::vector<StepSummary> step_log = {get_step_summary(uold, 0, 0.0)};
     std::size_t snapshot_idx = 0;
     std::vector<Real> snapshot_schedule = get_snapshot_schedule(params.tstop, params.io.nout);
 
-    step_log.push_back(get_step_summary(uold, step_number, t));
-    if (params.io.fprint > 0) {printer(step_log.back(), step_log.front().Etotal);}
-    if (!snapshot_schedule.empty() && snapshot_schedule.front() == 0) {
-        write_snapshot(params.io.output_dir, uold, params.mesh, t, snapshot_idx);
-        snapshot_schedule.erase(snapshot_schedule.begin());
-        snapshot_idx++;
-    }
+    call_printer_when_appropriate(step_log, params.io, false);
+    call_snapshot_writer_when_appropriate(uold, snapshot_schedule, snapshot_idx, 0.0, params, false);
 
     while (true) {
         bool stop = false;
@@ -48,16 +73,8 @@ Array superfv(const SolverParams& params) {
         step_log.push_back(get_step_summary(unew, step_number, t));
         
         if (t >= params.tstop || step_number >= params.max_steps) {stop=true;}
-        if (params.io.fprint > 0 && (step_number % params.io.fprint == 0 || stop)) {
-            printer(step_log.back(), step_log.front().Etotal);
-        }
-        if (!snapshot_schedule.empty() && (snapshot_schedule.front() <= t || stop)) {
-            while (!snapshot_schedule.empty() && snapshot_schedule.front() <= t) {
-                snapshot_schedule.erase(snapshot_schedule.begin());
-            }
-            write_snapshot(params.io.output_dir, unew, params.mesh, t, snapshot_idx);
-            snapshot_idx++;
-        }
+        call_printer_when_appropriate(step_log, params.io, stop);
+        call_snapshot_writer_when_appropriate(unew, snapshot_schedule, snapshot_idx, t, params, stop);
         if (stop) {break;}
         
         copy_contents(unew, uold);

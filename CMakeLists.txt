@@ -1,7 +1,10 @@
 # from the project root:
-#   build:  cmake --fresh -S . -B build && cmake --build build
-#   run:    ./build/superfv configs/square.cfg
-#   clean:  cmake --build build --target clean
+#
+#   build:          cmake -S . -B build && cmake --build build
+#   run:            ./build/superfv configs/square.cfg
+#   clean:          cmake --build build --target clean
+#
+#   fresh build:    cmake --fresh -S . -B build && cmake --build build
 
 cmake_minimum_required(VERSION 4.3)
 project(SuperFV LANGUAGES CXX)
