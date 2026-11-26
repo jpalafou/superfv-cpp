@@ -18,7 +18,7 @@ namespace {
     ) {
         size_t step_number = step_log.back().step_number;
         if (params.fprint > 0 && (step_number % params.fprint == 0 || stop)) {
-            printer(step_log.back(), step_log.front().Etotal);
+            printer(step_log.back(), step_log.front());
         }
     }
 

@@ -1,4 +1,5 @@
 #pragma once
+#include <chrono>
 #include <cstddef>
 #include <filesystem>
 #include <limits>
@@ -16,6 +17,7 @@ struct IOParams {
 struct StepSummary {
     size_t step_number;
     Real t;
+    std::chrono::steady_clock::time_point wall_time;
     Real rhomax = std::numeric_limits<Real>::lowest();
     Real rhomin = std::numeric_limits<Real>::max();
     Real Etotal = 0.0;
@@ -23,7 +25,7 @@ struct StepSummary {
 
 StepSummary get_step_summary(const Array& u, size_t step_number, Real t);
 
-void printer(const StepSummary& step_summary, Real Eref);
+void printer(const StepSummary& step_summary, const StepSummary& initial_summary);
 
 std::vector<Real> get_snapshot_schedule(Real tstop, std::size_t nout);
 

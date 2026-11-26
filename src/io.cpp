@@ -1,5 +1,6 @@
 #include "io.hpp"
 
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <filesystem>
@@ -14,7 +15,7 @@
 #include "utils.hpp"
 
 StepSummary get_step_summary(const Array& u, size_t step_number, Real t) {
-    StepSummary out{.step_number=step_number, .t=t};
+    StepSummary out{.step_number=step_number, .t=t, .wall_time=std::chrono::steady_clock::now()};
     for (size_t i = 0; i < u.get_nx(); i++) {
         for (size_t j = 0; j < u.get_ny(); j++) {
             for (size_t k = 0; k < u.get_nz(); k++) {
@@ -32,11 +33,12 @@ StepSummary get_step_summary(const Array& u, size_t step_number, Real t) {
     return out;
 }
 
-void printer(const StepSummary& step_summary, Real Eref) {
+void printer(const StepSummary& step_summary, const StepSummary& initial_summary) {
+    const double elapsed = std::chrono::duration<double>(step_summary.wall_time - initial_summary.wall_time).count();
     std::cout << std::format(
-        "step: {:>6}, t: {:>8.2e}, rho max: {:>9.2e}, rho min: {:>9.2e}, E cons: {:>9.2e}\n",
+        "step: {:>6}, t: {:>8.2e}, rho max: {:>9.2e}, rho min: {:>9.2e}, E cons: {:>9.2e}, wall time: {:.2f} s\n",
         step_summary.step_number, step_summary.t, step_summary.rhomax,
-        step_summary.rhomin, step_summary.Etotal - Eref
+        step_summary.rhomin, step_summary.Etotal - initial_summary.Etotal, elapsed
     );
 }
 
