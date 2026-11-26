@@ -40,7 +40,7 @@ Array superfv(const SolverParams& params) {
         bool stop = false;
         
         Real dt = compute_dt(uold, params.hydro.cfl, params.hydro.gamma, params.mesh);
-        if (t + dt > params.tstop) {dt = params.tstop - t; stop=true;};
+        if (params.clip_last_dt && t + dt > params.tstop) {dt = params.tstop - t; stop=true;}
         
         take_step(uold, unew, f, g, h, dt, params);
         t += dt;

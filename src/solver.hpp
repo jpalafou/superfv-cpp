@@ -19,6 +19,7 @@ struct SolverParams{
     const Setup setup;
     const Real tstop;
     const std::size_t max_steps;
+    const bool clip_last_dt;
 };
 
 Array superfv(const SolverParams& params);

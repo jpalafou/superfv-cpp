@@ -1,4 +1,4 @@
-[ ] `clip_last_dt` parameter: boolean
+[x] `clip_last_dt` parameter: boolean
 [x] `fprint` parameter: frequency at which a step summary is printed to the command line
         `fprint=0`: print nothing
         `fprint=1`: print every step

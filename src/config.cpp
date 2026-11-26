@@ -20,6 +20,7 @@ namespace {
 
         // optional config members and their defaults.
         Real                cfl = 0.8;
+        bool                clip_last_dt = true;
         std::size_t         fprint = 0;
         Real                gamma = 1.4;
         std::size_t         max_steps =  std::numeric_limits<std::size_t>::max();
@@ -98,7 +99,8 @@ namespace {
             .integrator = integrator,
             .setup = setup,
             .tstop = config.tstop,
-            .max_steps = config.max_steps
+            .max_steps = config.max_steps,
+            .clip_last_dt = config.clip_last_dt
         };
     }
 
@@ -126,6 +128,7 @@ SolverParams read_config(const std::string& path) {
         const std::string key = trim(line.substr(0, equal));
         std::istringstream input(line.substr(equal + 1));
         if      (key == "cfl") {input >> config.cfl;}
+        else if (key == "clip_last_dt") {input >> std::boolalpha >> config.clip_last_dt;}
         else if (key == "fprint") {input >> config.fprint;}
         else if (key == "gamma") {input >> config.gamma;}
         else if (key == "integrator") {input >> config.integrator;}
