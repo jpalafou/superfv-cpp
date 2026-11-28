@@ -11,23 +11,30 @@
 namespace {
     struct Config {
         // required config members start with invalid values.
-        std::string integrator;
-        int nghost = -1;
-        int nx = -1;
-        int p = -1;
-        std::string setup;
-        Real tstop = -1.0;
+        std::string         integrator;
+        int                 nghost = -1;
+        int                 nx = -1;
+        int                 p = -1;
+        std::string         setup;
+        Real                tstop = -1.0;
 
         // optional config members and their defaults.
         Real                cfl = 0.8;
         bool                clip_last_dt = true;
+        std::string         fallback_cascade = "MUSCL0";
         std::size_t         fprint = 0;
         Real                gamma = 1.4;
         std::size_t         max_steps =  std::numeric_limits<std::size_t>::max();
+        std::string         MUSCL_limiter = "moncen";
+        bool                NAD = true;
         std::size_t         nout = 0;
+        std::size_t         nrev = 1;
         std::size_t         ny = 1;
         std::size_t         nz = 1;
         std::string         output_dir = "out";
+        bool                PAD = true;
+        bool                SED = true;
+        Real                tolerance = 1e-5;
         std::string         x_lower = "periodic";
         std::string         x_upper = "none";
         Real                xlim0 = 0.0;
@@ -61,6 +68,21 @@ namespace {
             else {throw std::invalid_argument("unknown boundary condition: " + value);}
         };
 
+        const auto parse_fallback_cascade = [](const std::string& value) -> FallbackCascade {
+            if      (value == "none") {return FallbackCascade::none;}
+            else if (value == "full") {return FallbackCascade::full;}
+            else if (value == "MUSCL") {return FallbackCascade::MUSCL;}
+            else if (value == "MUSCL0") {return FallbackCascade::MUSCL0;}
+            else {throw std::invalid_argument("unknown fallback cascade: " + value);}
+        };
+
+        const auto parse_MUSCL_limiter = [](const std::string& value) -> SlopeLimiter {
+            if      (value == "none") {return SlopeLimiter::none;}
+            else if (value == "minmod") {return SlopeLimiter::minmod;}
+            else if (value == "moncen") {return SlopeLimiter::moncen;}
+            else {throw std::invalid_argument("unknown MUSCL limiter: " + value);}
+        };
+
         const HydroParams hydro{
             .gamma = config.gamma,
             .cfl = config.cfl
@@ -90,12 +112,22 @@ namespace {
             .nout=config.nout,
             .output_dir=config.output_dir
         };
+        const MOOD_Scheme scheme(
+            config.p, 
+            config.nrev, 
+            parse_fallback_cascade(config.fallback_cascade), 
+            parse_MUSCL_limiter(config.MUSCL_limiter),
+            config.tolerance,
+            config.NAD,
+            config.PAD,
+            config.SED
+        );
         return {
             .hydro = hydro,
             .mesh = mesh,
             .bc = bc,
             .io = io,
-            .p = static_cast<std::size_t>(config.p),
+            .scheme = scheme,
             .integrator = integrator,
             .setup = setup,
             .tstop = config.tstop,
@@ -129,18 +161,25 @@ SolverParams read_config(const std::string& path) {
         std::istringstream input(line.substr(equal + 1));
         if      (key == "cfl") {input >> config.cfl;}
         else if (key == "clip_last_dt") {input >> std::boolalpha >> config.clip_last_dt;}
+        else if (key == "fallback_cascade") {input >> config.fallback_cascade;}
         else if (key == "fprint") {input >> config.fprint;}
         else if (key == "gamma") {input >> config.gamma;}
         else if (key == "integrator") {input >> config.integrator;}
         else if (key == "max_steps") {input >> config.max_steps;}
+        else if (key == "MUSCL_limiter") {input >> config.MUSCL_limiter;}
+        else if (key == "NAD") {input >> std::boolalpha >> config.NAD;}
         else if (key == "nghost") {input >> config.nghost;}
         else if (key == "nout") {input >> config.nout;}
+        else if (key == "nrev") {input >> config.nrev;}
         else if (key == "nx") {input >> config.nx;}
         else if (key == "ny") {input >> config.ny;}
         else if (key == "nz") {input >> config.nz;}
         else if (key == "output_dir") {input >> config.output_dir;}
         else if (key == "p") {input >> config.p;}
+        else if (key == "PAD") {input >> std::boolalpha >> config.PAD;}
+        else if (key == "SED") {input >> std::boolalpha >> config.SED;}
         else if (key == "setup") {input >> config.setup;}
+        else if (key == "tolerance") {input >> config.tolerance;}
         else if (key == "tstop") {input >> config.tstop;}
         else if (key == "x_lower") {input >> config.x_lower;}
         else if (key == "x_upper") {input >> config.x_upper;}

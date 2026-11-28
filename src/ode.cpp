@@ -21,7 +21,7 @@ void update_unew(const Array& uold, const Array& dudt, Array& unew, Real dt) {
 
 void forward_euler_step(const Array& uold, Array& unew, Array& f, Array& g, Array& h, Real dt, const SolverParams& params) {
     Array dudt = get_empty_copy(unew);
-    update_fluxes(uold, f, g, h, params.p, params.bc, params.hydro.gamma);
+    update_fluxes(uold, f, g, h, params.scheme.p, params.bc, params.hydro.gamma);
     update_dudt(dudt, f, g, h, params.mesh);
     update_unew(uold, dudt, unew, dt);
     return;
@@ -31,11 +31,11 @@ void ssprk2_step(const Array& uold, Array& unew, Array& f, Array& g, Array& h, R
     Array dudt = get_empty_copy(unew);
     Array utmp = get_empty_copy(unew);
 
-    update_fluxes(uold, f, g, h, params.p, params.bc, params.hydro.gamma);
+    update_fluxes(uold, f, g, h, params.scheme.p, params.bc, params.hydro.gamma);
     update_dudt(dudt, f, g, h, params.mesh);
     update_unew(uold, dudt, utmp, dt);
 
-    update_fluxes(utmp, f, g, h, params.p, params.bc, params.hydro.gamma);
+    update_fluxes(utmp, f, g, h, params.scheme.p, params.bc, params.hydro.gamma);
     update_dudt(dudt, f, g, h, params.mesh);
     
     for (size_t v = 0; v < uold.get_nvars(); v++) {
@@ -57,11 +57,11 @@ void ssprk3_step(const Array& uold, Array& unew, Array& f, Array& g, Array& h, R
     Array dut2 = get_empty_copy(unew);
     Array utmp = get_empty_copy(unew);
 
-    update_fluxes(uold, f, g, h, params.p, params.bc, params.hydro.gamma);
+    update_fluxes(uold, f, g, h, params.scheme.p, params.bc, params.hydro.gamma);
     update_dudt(dut0, f, g, h, params.mesh);
     update_unew(uold, dut0, utmp, dt);
 
-    update_fluxes(utmp, f, g, h, params.p, params.bc, params.hydro.gamma);
+    update_fluxes(utmp, f, g, h, params.scheme.p, params.bc, params.hydro.gamma);
     update_dudt(dut1, f, g, h, params.mesh);
     for (size_t v = 0; v < uold.get_nvars(); v++) {
         for (size_t i = 0; i < uold.get_nx(); i++) {
@@ -75,7 +75,7 @@ void ssprk3_step(const Array& uold, Array& unew, Array& f, Array& g, Array& h, R
         }
     }
 
-    update_fluxes(utmp, f, g, h, params.p, params.bc, params.hydro.gamma);
+    update_fluxes(utmp, f, g, h, params.scheme.p, params.bc, params.hydro.gamma);
     update_dudt(dut2, f, g, h, params.mesh);
 
     for (size_t v = 0; v < uold.get_nvars(); v++) {
@@ -98,19 +98,19 @@ void rk4_step(const Array& uold, Array& unew, Array& f, Array& g, Array& h, Real
     Array dut3 = get_empty_copy(unew);
     Array utmp = get_empty_copy(unew);
 
-    update_fluxes(uold, f, g, h, params.p, params.bc, params.hydro.gamma);
+    update_fluxes(uold, f, g, h, params.scheme.p, params.bc, params.hydro.gamma);
     update_dudt(dut0, f, g, h, params.mesh);
     update_unew(uold, dut0, utmp, 0.5 * dt);
 
-    update_fluxes(utmp, f, g, h, params.p, params.bc, params.hydro.gamma);
+    update_fluxes(utmp, f, g, h, params.scheme.p, params.bc, params.hydro.gamma);
     update_dudt(dut1, f, g, h, params.mesh);
     update_unew(uold, dut1, utmp, 0.5 * dt);
 
-    update_fluxes(utmp, f, g, h, params.p, params.bc, params.hydro.gamma);
+    update_fluxes(utmp, f, g, h, params.scheme.p, params.bc, params.hydro.gamma);
     update_dudt(dut2, f, g, h, params.mesh);
     update_unew(uold, dut2, utmp, dt);
 
-    update_fluxes(utmp, f, g, h, params.p, params.bc, params.hydro.gamma);
+    update_fluxes(utmp, f, g, h, params.scheme.p, params.bc, params.hydro.gamma);
     update_dudt(dut3, f, g, h, params.mesh);
     
     for (size_t v = 0; v < uold.get_nvars(); v++) {

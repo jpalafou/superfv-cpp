@@ -42,7 +42,7 @@ namespace {
 
 Array superfv(const SolverParams& params) {
     UniformMesh mesh = UniformMesh(params.mesh);
-    Array uold = ic(mesh, params.p, params.setup, params.hydro.gamma);
+    Array uold = ic(mesh, params.scheme.p, params.setup, params.hydro.gamma);
     Array f(uold.get_nvars(), uold.get_nx() + 1, uold.get_ny(), uold.get_nz());
     Array g, h;
     if (params.mesh.ndim() >= 2) {

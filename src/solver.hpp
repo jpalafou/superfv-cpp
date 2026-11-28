@@ -8,13 +8,14 @@
 #include "io.hpp"
 #include "mesh.hpp"
 #include "ode.hpp"
+#include "schemes.hpp"
 
 struct SolverParams{
     const HydroParams hydro;
     const UniformMeshParams mesh;
     const BC_Params bc;
     const IOParams io;
-    const std::size_t p;
+    const MOOD_Scheme scheme;
     const Integrator integrator;
     const Setup setup;
     const Real tstop;

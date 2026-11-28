@@ -23,6 +23,7 @@ add_executable(superfv
     src/ode.cpp
     src/quadrature.cpp
     src/riemann_solver.cpp
+    src/schemes.cpp
     src/solver.cpp
     src/stencils.cpp
     src/sweep.cpp
